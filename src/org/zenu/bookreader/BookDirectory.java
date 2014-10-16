@@ -11,6 +11,8 @@ public class BookDirectory
 	public BookDirectory(File f)
 	{
 		super(f);
+		
+		this.Title = f.getName();
 	}
 
 	@Override

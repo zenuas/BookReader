@@ -33,6 +33,7 @@ public class Bookshelf
 
 	public void createShelf(String shelf_name)
 	{
+		setTitle(shelf_name);
 		final GridView grid = (GridView) findViewById(R.id.shelf);
 		
 		final LayoutInflater inflater_ = getLayoutInflater();

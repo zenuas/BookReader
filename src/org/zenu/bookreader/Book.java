@@ -18,6 +18,12 @@ public class Book
 	{
 		this.Title = f.getName();
 		this.Path = f.getAbsolutePath();
+		
+		int ext = this.Title.lastIndexOf('.');
+		if(ext >= 0)
+		{
+			this.Title = this.Title.substring(0, ext);
+		}
 	}
 	
 	public CharSequence getTitle()
