@@ -5,11 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -68,11 +70,33 @@ public class Bookshelf
 					if(position < getCount())
 					{
 						Book book = getItem(position);
-						item.icon.setImageDrawable(book.getCover());
-						item.text.setText(book.getTitle());
+						try
+						{
+							item.icon.setImageDrawable(book.getCover());
+							item.text.setText(book.getTitle());
+						}
+						finally
+						{
+							book.close();
+						}
 					}
 					
 					return(convertView);
+				}
+			});
+		
+		grid.setOnItemClickListener(new AdapterView.OnItemClickListener()
+			{
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+				{
+					Book book = (Book) parent.getItemAtPosition(position);
+					
+					Intent intent = new Intent();
+					intent.setClass(Bookshelf.this, BookViewer.class);
+					intent.putExtra(BookViewer.class.getName() + ".path", book.Path);
+					
+					Bookshelf.this.startActivity(intent);
 				}
 			});
 	}
@@ -86,11 +110,18 @@ public class Bookshelf
 		{
 			if(f.isDirectory())
 			{
-				xs.add(new BookDirectory(f));
+				xs.add(new BookDirectory(f.getAbsolutePath()));
 			}
 			else
 			{
-				xs.add(new Book(f));
+				try
+				{
+					xs.add(((ApplicationContext) getApplicationContext()).getDB().getBook(f.getAbsolutePath()));
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
 			}
 		}
 		

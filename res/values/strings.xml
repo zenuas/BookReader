@@ -2,5 +2,7 @@
 
     <string name="app_name">BookReader</string>
     <string name="icon"></string>
+    
+    <string name="bookviewer_fileopenerror">BookViewer File Open Error</string>
 
 </resources>

@@ -21,6 +21,19 @@ public class ApplicationContext
 	public void onCreate()
 	{
 		super.onCreate();
+		registerBugReport();
+		
+		db_ = new BookCacheDB(this);
+	}
+	
+	private BookCacheDB db_;
+	public BookCacheDB getDB()
+	{
+		return(db_);
+	}
+	
+	public void registerBugReport()
+	{
 		
 		final SharedPreferences pref = getSharedPreferences(getClass().getName(), MODE_PRIVATE);
 		

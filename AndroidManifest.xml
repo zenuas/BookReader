@@ -17,7 +17,7 @@
         >
         
         <activity
-            android:name="Main"
+            android:name="Bookshelf"
             android:launchMode="singleInstance"
             android:theme="@android:style/Theme.Light"
             >
@@ -27,6 +27,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
+        <activity
+            android:name="BookViewer"
+            android:theme="@android:style/Theme.Light.NoTitleBar"
+            />
     </application>
 
 </manifest>
