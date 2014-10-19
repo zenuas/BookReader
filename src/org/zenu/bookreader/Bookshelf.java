@@ -76,8 +76,10 @@ public class Bookshelf
 						Book book = getItem(position);
 						try
 						{
+							boolean loaded = (book.Cover != null);
 							item.icon.setImageDrawable(book.getCover());
 							item.text.setText(book.getTitle());
+							if(!loaded) {((ApplicationContext) getApplicationContext()).getDB().saveBook(book);}
 						}
 						finally
 						{
@@ -126,7 +128,7 @@ public class Bookshelf
 				}
 				else
 				{
-					xs.add(context.getDB().getBook(f.getCanonicalPath()));
+					xs.add(context.getDB().getBook(f));
 				}
 			}
 			catch(Exception e)

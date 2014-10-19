@@ -48,7 +48,7 @@ public class BookViewer
 			book_ = null;
 		}
 	}
-
+	
 	private ScaleGestureDetector scale_dector_;
 	private GestureDetector fling_dector_;
 	
@@ -225,11 +225,13 @@ public class BookViewer
 				
 				Book next = books.get(current + 1);
 				next.Page = "";
+				next.setPageIndex(0);
 				
 				setupViewer(next);
 				Toast.makeText(this, book_.getTitle(), Toast.LENGTH_SHORT).show();
 			}
 			image_.setImageDrawable(book_.currentPage());
+			((ApplicationContext) getApplicationContext()).getDB().saveBook(book_);
 		}
 		catch(Exception e)
 		{
@@ -256,6 +258,7 @@ public class BookViewer
 				Toast.makeText(this, book_.getTitle(), Toast.LENGTH_SHORT).show();
 			}
 			image_.setImageDrawable(book_.currentPage());
+			((ApplicationContext) getApplicationContext()).getDB().saveBook(book_);
 		}
 		catch(Exception e)
 		{

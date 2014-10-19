@@ -68,8 +68,29 @@ public class BookDirectory
 	}
 	
 	@Override
+	public void setPageIndex(int page)
+	{
+	}
+	
+	@Override
 	public int getMaxPage()
 	{
 		return(-1);
+	}
+	
+	@Override
+	public void setMaxPage(int page)
+	{
+	}
+	
+	@Override
+	public long getLastModified()
+	{
+		return(0);
+	}
+	
+	@Override
+	public void setLastModified(long d)
+	{
 	}
 }

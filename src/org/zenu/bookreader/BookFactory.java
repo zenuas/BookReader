@@ -8,7 +8,7 @@ public class BookFactory
 	@SuppressLint("DefaultLocale")
 	public static Book open(String path) throws Exception
 	{
-		String ext = Path.getExtension(path);
+		String ext = Path.getExtension(path).toLowerCase();
 		
 		if(contains(BookZipArchive.AcceptExtension, ext)) {return(new BookZipArchive(path));}
 		

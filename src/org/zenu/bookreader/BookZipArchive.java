@@ -1,5 +1,6 @@
 package org.zenu.bookreader;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -18,14 +19,20 @@ public class BookZipArchive
 	public BookZipArchive(String path)
 	{
 		super(path);
+		setLastModified(new File(path).lastModified());
 	}
-
+	
 	private ZipFile zip_ = null;
 	private String[] files_ = null;
 	public ZipFile getArchive() throws IOException
 	{
 		if(zip_ == null) {zip_ = new ZipFile(Path);}
 		return(zip_);
+	}
+	
+	public boolean fileLoaded()
+	{
+		return(files_ != null);
 	}
 	
 	public String[] getArchiveFiles() throws IOException
@@ -76,17 +83,6 @@ public class BookZipArchive
 				ZipFile zip = getArchive();
 				String[] files = getArchiveFiles();
 				return(Drawable.createFromStream(zip.getInputStream(zip.getEntry(files[0])), files[0]));
-				/*
-				ZipFile zip = getArchive();
-				for(Enumeration<? extends ZipEntry> xs = zip.entries(); xs.hasMoreElements();)
-				{
-					ZipEntry entry = xs.nextElement();
-					if(!entry.isDirectory())
-					{
-						return(Drawable.createFromStream(zip.getInputStream(entry), entry.getName()));
-					}
-				}
-				*/
 			}
 			catch(IOException e)
 			{
@@ -176,16 +172,25 @@ public class BookZipArchive
 		String[] files = getArchiveFiles();
 		Page = files[files.length - 1];
 	}
+
+	private int page_index_ = -1;
+	private int max_page_ = -1;
+	private long last_modified_ = 0;
 	
 	@Override
 	public int getPageIndex()
 	{
+		if(!fileLoaded()) {return(page_index_);}
 		try
 		{
 			String[] files = getArchiveFiles();
 			for(int i = 0; i < files.length; i++)
 			{
-				if(files[i].equals(Page)) {return(i);}
+				if(files[i].equals(Page))
+				{
+					page_index_ = i;
+					return(i);
+				}
 			}
 		}
 		catch(IOException e)
@@ -196,16 +201,42 @@ public class BookZipArchive
 	}
 	
 	@Override
+	public void setPageIndex(int page)
+	{
+		page_index_ = page;
+	}
+	
+	@Override
 	public int getMaxPage()
 	{
+		if(!fileLoaded()) {return(max_page_);}
 		try
 		{
-			return(getArchiveFiles().length);
+			max_page_ = getArchiveFiles().length;
+			return(max_page_);
 		}
 		catch(IOException e)
 		{
 			e.printStackTrace();
 		}
 		return(-1);
+	}
+	
+	@Override
+	public void setMaxPage(int page)
+	{
+		max_page_ = page;
+	}
+	
+	@Override
+	public long getLastModified()
+	{
+		return(last_modified_);
+	}
+	
+	@Override
+	public void setLastModified(long d)
+	{
+		last_modified_ = d;
 	}
 }

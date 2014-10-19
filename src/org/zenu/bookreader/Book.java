@@ -42,11 +42,21 @@ public abstract class Book
 	@SuppressWarnings("deprecation")
 	public void deserializeCover(byte[] data)
 	{
+		if(data == null)
+		{
+			Cover = null;
+			return;
+		}
 		Cover = new BitmapDrawable(BitmapFactory.decodeByteArray(data, 0, data.length));
 	}
 	
 	public void deserializeCover(Context context, byte[] data)
 	{
+		if(data == null)
+		{
+			Cover = null;
+			return;
+		}
 		Cover = new BitmapDrawable(context.getResources(), BitmapFactory.decodeByteArray(data, 0, data.length));
 	}
 	
@@ -58,7 +68,11 @@ public abstract class Book
 	public abstract void moveFirstPage() throws Exception;
 	public abstract void moveLastPage() throws Exception;
 	public abstract int getPageIndex();
+	public abstract void setPageIndex(int page);
 	public abstract int getMaxPage();
+	public abstract void setMaxPage(int page);
+	public abstract long getLastModified();
+	public abstract void setLastModified(long d);
 	
 	public void close()
 	{
