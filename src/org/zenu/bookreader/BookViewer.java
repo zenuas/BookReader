@@ -1,21 +1,24 @@
 package org.zenu.bookreader;
 
 import android.app.Activity;
+import android.graphics.Matrix;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.view.KeyEvent;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
-import android.view.View;
-import android.view.View.OnTouchListener;
+import android.view.ScaleGestureDetector;
 import android.view.ViewTreeObserver;
+import android.widget.ImageView;
 import android.widget.Toast;
+import android.widget.ImageView.ScaleType;
 
 
 public class BookViewer
 	extends Activity
 {
 	private Book book_ = null;
-	private MatrixImageView image_ = null;
+	private ImageView image_ = null;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -47,10 +50,14 @@ public class BookViewer
 			book_ = null;
 		}
 	}
+
+	private ScaleGestureDetector scale_dector_;
+	private GestureDetector fling_dector_;
 	
 	public void createViewer()
 	{
-		image_ = (MatrixImageView) findViewById(R.id.viewer);
+		image_ = (ImageView) findViewById(R.id.viewer);
+		image_.setScaleType(ScaleType.MATRIX);
 		
 		Drawable p = null;
 		try
@@ -67,42 +74,66 @@ public class BookViewer
 				@Override
 				public void onGlobalLayout()
 				{
-					image_.setAutoRotateAndFitScaleAndCenter();
+					setAutoRotateAndFitScaleAndCenter();
 				}
 			});
 		
-		image_.setOnTouchListener(new OnTouchListener()
+		scale_dector_ = new ScaleGestureDetector(this, new ScaleGestureDetector.SimpleOnScaleGestureListener()
 			{
 				@Override
-				public boolean onTouch(View v, MotionEvent event)
+				public boolean onScale(ScaleGestureDetector detector)
 				{
-					if(event.getAction() == MotionEvent.ACTION_UP)
-					{
-						float x = event.getX() - image_.getLeft();
-						
-						try
-						{
-							// とりあえず右綴じ想定でビューの左2/3をタッチでページ送り、右1/3をタッチでページ戻り
-							if(x < image_.getWidth() * 2 / 3)
-							{
-								book_.moveNextPage();
-							}
-							else
-							{
-								book_.movePrevPage();
-							}
-							image_.setImageDrawable(book_.currentPage());
-						}
-						catch(Exception e)
-						{
-							e.printStackTrace();
-						}
-						image_.setAutoRotateAndFitScaleAndCenter();
-						return(true);
-					}
-					return(false);
+					float scale = detector.getScaleFactor();
+					Matrix x = new Matrix(image_.getMatrix());
+					x.postTranslate(-detector.getFocusX(), -detector.getFocusY());
+					x.postScale(scale, scale);
+					x.postTranslate(detector.getFocusX(), detector.getFocusY());
+					image_.setImageMatrix(x);
+					image_.invalidate();
+					return(super.onScale(detector));
 				}
 			});
+		
+		fling_dector_ = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener()
+			{
+				@Override
+				public boolean onSingleTapUp(MotionEvent event)
+				{
+					float x = event.getX() - image_.getLeft();
+					
+					try
+					{
+						// とりあえず右綴じ想定でビューの左2/3をタッチでページ送り、右1/3をタッチでページ戻り
+						if(x < image_.getWidth() * 2 / 3)
+						{
+							book_.moveNextPage();
+						}
+						else
+						{
+							book_.movePrevPage();
+						}
+						image_.setImageDrawable(book_.currentPage());
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+					}
+					setAutoRotateAndFitScaleAndCenter();
+					return(super.onSingleTapUp(event));
+				}
+			});
+	}
+	
+	@Override
+	public boolean onTouchEvent(MotionEvent event)
+	{
+		boolean scaled = scale_dector_.isInProgress();
+		scale_dector_.onTouchEvent(event);
+		if(scaled || scale_dector_.isInProgress())
+		{
+			return(true);
+		}
+		return(fling_dector_.onTouchEvent(event));
 	}
 	
 	@Override
@@ -119,4 +150,38 @@ public class BookViewer
 			e.printStackTrace();
 		}
 	}
+	
+	public void setAutoRotateAndFitScaleAndCenter()
+	{
+		Rect rc = image_.getDrawable().getBounds();
+		
+		float view_height = image_.getHeight();
+		float view_width = image_.getWidth();
+		float image_height = rc.height();
+		float image_width = rc.width();
+		
+		Matrix x = new Matrix();
+		
+		// ビューが縦表示で、画像の横幅が縦幅の1.5倍を超えていたら90度回転
+		float scale = 1.0f;
+		x.postTranslate(-image_width / 2, -image_height / 2);
+		if(view_height > view_width && image_width > image_height * 1.5)
+		{
+			x.postRotate(90);
+			scale = view_height / image_width;
+		}
+		else
+		{
+			float height_scale = view_height / image_height;
+			float width_scale = view_width / image_width;
+			
+			scale = Math.min(height_scale, width_scale);
+		}
+		
+		x.postScale(scale, scale);
+		x.postTranslate(view_width / 2, view_height / 2);
+		image_.setImageMatrix(x);
+		image_.invalidate();
+	}
+	
 }
