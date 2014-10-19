@@ -8,7 +8,13 @@ import java.util.List;
 public class Path
 {
 	public static final char PathSeparator = '/';
-
+	
+	public static String getDirectoryName(String path)
+	{
+		int dir = path.lastIndexOf(PathSeparator);
+		return(dir >= 0 ? path.substring(0, dir + 1) : "");
+	}
+	
 	public static String getFileName(String path)
 	{
 		int dir = path.lastIndexOf(PathSeparator);

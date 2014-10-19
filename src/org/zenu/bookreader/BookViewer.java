@@ -1,5 +1,7 @@
 package org.zenu.bookreader;
 
+import java.util.List;
+
 import android.app.Activity;
 import android.graphics.Matrix;
 import android.graphics.Rect;
@@ -27,16 +29,12 @@ public class BookViewer
 		setContentView(R.layout.bookviewer);
 		
 		String path = getIntent().getStringExtra(BookViewer.class.getName() + ".path");
-		try
-		{
-			book_ = ((ApplicationContext) getApplicationContext()).getDB().getBook(path);
-		}
-		catch(Exception e)
+		createViewer();
+		if(!setupViewer(path))
 		{
 			Toast.makeText(this, R.string.bookviewer_fileopenerror, Toast.LENGTH_LONG).show();
 			this.finish();
 		}
-		createViewer();
 	}
 	
 	@Override
@@ -59,16 +57,6 @@ public class BookViewer
 		image_ = (ImageView) findViewById(R.id.viewer);
 		image_.setScaleType(ScaleType.MATRIX);
 		
-		Drawable p = null;
-		try
-		{
-			p = book_.currentPage();
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-		image_.setImageDrawable(p);
 		image_.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener()
 			{
 				@Override
@@ -102,26 +90,15 @@ public class BookViewer
 				@Override
 				public boolean onSingleTapUp(MotionEvent event)
 				{
-					float x = event.getX() - image_.getLeft();
-					
-					try
+					// とりあえず右綴じ想定でビューの左2/3をタッチでページ送り、右1/3をタッチでページ戻り
+					if(event.getX() - image_.getLeft() < image_.getWidth() * 2 / 3)
 					{
-						// とりあえず右綴じ想定でビューの左2/3をタッチでページ送り、右1/3をタッチでページ戻り
-						if(x < image_.getWidth() * 2 / 3)
-						{
-							book_.moveNextPage();
-						}
-						else
-						{
-							book_.movePrevPage();
-						}
-						image_.setImageDrawable(book_.currentPage());
+						moveNextPage();
 					}
-					catch(Exception e)
+					else
 					{
-						e.printStackTrace();
+						movePrevPage();
 					}
-					setAutoRotateAndFitScaleAndCenter();
 					return(super.onSingleTapUp(event));
 				}
 				
@@ -135,6 +112,39 @@ public class BookViewer
 					return(super.onScroll(e1, e2, distanceX, distanceY));
 				}
 			});
+	}
+	
+	public boolean setupViewer(String path)
+	{
+		Book book;
+		try
+		{
+			book = ((ApplicationContext) getApplicationContext()).getDB().getBook(path);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			return(false);
+		}
+		return(setupViewer(book));
+	}
+	
+	public boolean setupViewer(Book book)
+	{
+		Drawable p;
+		try
+		{
+			p = book.currentPage();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			return(false);
+		}
+		image_.setImageDrawable(p);
+		if(book_ != null) {book_.close();}
+		book_ = book;
+		return(true);
 	}
 	
 	@Override
@@ -153,15 +163,7 @@ public class BookViewer
 	public void onBackPressed()
 	{
 		//super.onBackPressed();
-		try
-		{
-			book_.moveNextPage();
-			image_.setImageDrawable(book_.currentPage());
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
+		moveNextPage();
 	}
 	
 	public void setAutoRotateAndFitScaleAndCenter()
@@ -197,4 +199,67 @@ public class BookViewer
 		image_.invalidate();
 	}
 	
+	public int indexOfBook(List<Book> xs, Book x)
+	{
+		for(int i = 0; i < xs.size(); i++)
+		{
+			if(xs.get(i).Path.equals(x.Path)) {return(i);}
+		}
+		return(-1);
+	}
+	
+	public void moveNextPage()
+	{
+		try
+		{
+			if(!book_.moveNextPage())
+			{
+				// 最後のページであれば次の本の1ページ目に進む
+				List<Book> books = Bookshelf.getBooks((ApplicationContext) getApplicationContext(), Path.getDirectoryName(book_.Path), false);
+				int current = indexOfBook(books, book_);
+				if(current + 1 >= books.size())
+				{
+					Toast.makeText(this, R.string.nextbook_not_found, Toast.LENGTH_SHORT).show();
+					return;
+				}
+				
+				Book next = books.get(current + 1);
+				next.Page = "";
+				
+				setupViewer(next);
+				Toast.makeText(this, book_.getTitle(), Toast.LENGTH_SHORT).show();
+			}
+			image_.setImageDrawable(book_.currentPage());
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	public void movePrevPage()
+	{
+		try
+		{
+			if(!book_.movePrevPage())
+			{
+				// 最初のページであれば前の本に戻る
+				List<Book> books = Bookshelf.getBooks((ApplicationContext) getApplicationContext(), Path.getDirectoryName(book_.Path), false);
+				int current = indexOfBook(books, book_);
+				if(current <= 0)
+				{
+					Toast.makeText(this, R.string.prevbook_not_found, Toast.LENGTH_SHORT).show();
+					return;
+				}
+				
+				setupViewer(books.get(current - 1));
+				Toast.makeText(this, book_.getTitle(), Toast.LENGTH_SHORT).show();
+			}
+			image_.setImageDrawable(book_.currentPage());
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
 }

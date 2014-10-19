@@ -4,5 +4,7 @@
     <string name="icon"></string>
     
     <string name="bookviewer_fileopenerror">BookViewer File Open Error</string>
+    <string name="nextbook_not_found">次の本が見つかりません。</string>
+    <string name="prevbook_not_found">前の本が見つかりません。</string>
 
 </resources>

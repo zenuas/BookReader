@@ -37,7 +37,7 @@ public class Bookshelf
 	public void createShelf(String shelf_name)
 	{
 		setTitle(shelf_name);
-		List<Book> books = getBooks(shelf_name);
+		List<Book> books = getBooks(shelf_name, true);
 		if(books == null) {return;}
 		
 		final GridView grid = (GridView) findViewById(R.id.shelf);
@@ -105,7 +105,12 @@ public class Bookshelf
 			});
 	}
 	
-	public List<Book> getBooks(String shelf_name)
+	public List<Book> getBooks(String shelf_name, boolean include_dir)
+	{
+		return(getBooks((ApplicationContext) getApplicationContext(), shelf_name, include_dir));
+	}
+	
+	public static List<Book> getBooks(ApplicationContext context, String shelf_name, boolean include_dir)
 	{
 		File[] files = new File(shelf_name).listFiles();
 		if(files == null) {return(null);}
@@ -113,20 +118,20 @@ public class Bookshelf
 		List<Book> xs = new ArrayList<Book>();
 		for(File f : Path.sortWindowsFolder(Arrays.asList(files)))
 		{
-			if(f.isDirectory())
+			try
 			{
-				xs.add(new BookDirectory(f.getAbsolutePath()));
+				if(f.isDirectory())
+				{
+					if(include_dir) {xs.add(new BookDirectory(f.getCanonicalPath()));}
+				}
+				else
+				{
+					xs.add(context.getDB().getBook(f.getCanonicalPath()));
+				}
 			}
-			else
+			catch(Exception e)
 			{
-				try
-				{
-					xs.add(((ApplicationContext) getApplicationContext()).getDB().getBook(f.getAbsolutePath()));
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-				}
+				e.printStackTrace();
 			}
 		}
 		
