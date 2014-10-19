@@ -1,7 +1,10 @@
 package org.zenu.bookreader;
 
+import android.annotation.SuppressLint;
 import java.util.Comparator;
 
+
+@SuppressLint("DefaultLocale")
 public class ComparatorWindowsFileName<T>
 	implements Comparator<T>
 {
@@ -14,8 +17,8 @@ public class ComparatorWindowsFileName<T>
 	@Override
 	public int compare(T left_, T right_)
 	{
-		String left = f_.invoke(left_);
-		String right = f_.invoke(right_);
+		String left = f_.invoke(left_).toUpperCase();
+		String right = f_.invoke(right_).toUpperCase();
 		
 		int left_index = 0;
 		int right_index = 0;

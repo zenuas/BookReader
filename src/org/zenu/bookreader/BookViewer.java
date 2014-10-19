@@ -3,6 +3,7 @@ package org.zenu.bookreader;
 import android.app.Activity;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
@@ -14,6 +15,7 @@ public class BookViewer
 	extends Activity
 {
 	private Book book_ = null;
+	private MatrixImageView image_ = null;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -48,7 +50,7 @@ public class BookViewer
 	
 	public void createViewer()
 	{
-		final MatrixImageView image = (MatrixImageView) findViewById(R.id.viewer);
+		image_ = (MatrixImageView) findViewById(R.id.viewer);
 		
 		Drawable p = null;
 		try
@@ -59,36 +61,62 @@ public class BookViewer
 		{
 			e.printStackTrace();
 		}
-		image.setImageDrawable(p);
-		image.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener()
+		image_.setImageDrawable(p);
+		image_.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener()
 			{
 				@Override
 				public void onGlobalLayout()
 				{
-					image.setAutoRotateAndFitScaleAndCenter();
+					image_.setAutoRotateAndFitScaleAndCenter();
 				}
 			});
 		
-		image.setOnTouchListener(new OnTouchListener()
+		image_.setOnTouchListener(new OnTouchListener()
 			{
 				@Override
 				public boolean onTouch(View v, MotionEvent event)
 				{
 					if(event.getAction() == MotionEvent.ACTION_UP)
 					{
+						float x = event.getX() - image_.getLeft();
+						
 						try
 						{
-							book_.moveNextPage();
-							image.setImageDrawable(book_.currentPage());
+							// とりあえず右綴じ想定でビューの左2/3をタッチでページ送り、右1/3をタッチでページ戻り
+							if(x < image_.getWidth() * 2 / 3)
+							{
+								book_.moveNextPage();
+							}
+							else
+							{
+								book_.movePrevPage();
+							}
+							image_.setImageDrawable(book_.currentPage());
 						}
 						catch(Exception e)
 						{
 							e.printStackTrace();
 						}
-						image.setAutoRotateAndFitScaleAndCenter();
+						image_.setAutoRotateAndFitScaleAndCenter();
+						return(true);
 					}
-					return(true);
+					return(false);
 				}
 			});
+	}
+	
+	@Override
+	public void onBackPressed()
+	{
+		//super.onBackPressed();
+		try
+		{
+			book_.moveNextPage();
+			image_.setImageDrawable(book_.currentPage());
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 }

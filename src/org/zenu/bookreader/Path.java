@@ -64,7 +64,7 @@ public class Path
 				@Override
 				public int compare(File left_, File right_)
 				{
-					if(left_.isDirectory() == right_.isDirectory()) {super.compare(left_, right_);}
+					if(left_.isDirectory() == right_.isDirectory()) {return(super.compare(left_, right_));}
 					return(left_.isDirectory() ? -1 : 1);
 				}
 			};
