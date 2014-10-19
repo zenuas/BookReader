@@ -83,8 +83,11 @@ public class BookViewer
 				@Override
 				public boolean onScale(ScaleGestureDetector detector)
 				{
+					// getScaleFactorの1/8倍でスケールを変更、なんとなく操作しやすかった倍率で根拠は無い
 					float scale = detector.getScaleFactor();
-					Matrix x = new Matrix(image_.getMatrix());
+					scale = (scale - 1.0f) / 8.0f + 1.0f;
+					
+					Matrix x = new Matrix(image_.getImageMatrix());
 					x.postTranslate(-detector.getFocusX(), -detector.getFocusY());
 					x.postScale(scale, scale);
 					x.postTranslate(detector.getFocusX(), detector.getFocusY());
@@ -120,6 +123,16 @@ public class BookViewer
 					}
 					setAutoRotateAndFitScaleAndCenter();
 					return(super.onSingleTapUp(event));
+				}
+				
+				@Override
+				public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY)
+				{
+					Matrix x = new Matrix(image_.getImageMatrix());
+					x.postTranslate(-distanceX, -distanceY);
+					image_.setImageMatrix(x);
+					image_.invalidate();
+					return(super.onScroll(e1, e2, distanceX, distanceY));
 				}
 			});
 	}
