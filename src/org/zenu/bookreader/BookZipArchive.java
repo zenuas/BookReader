@@ -2,8 +2,6 @@ package org.zenu.bookreader;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -44,76 +42,7 @@ public class BookZipArchive
 					xs.add(entry.getName());
 				}
 			}
-			
-			// WindowsXP以降のファイル名ソーと順を模倣
-			Collections.sort(xs, new Comparator<String>()
-				{
-					@Override
-					public int compare(String left, String right)
-					{
-						int left_index = 0;
-						int right_index = 0;
-						
-						while(left_index < left.length() && right_index < right.length())
-						{
-							char left_char = left.charAt(left_index);
-							char right_char = right.charAt(right_index);
-							
-							if(left_char == right_char)
-							{
-								left_index++;
-								right_index++;
-							}
-							else if(
-								left_char >= '0' && left_char <= '9' &&
-								right_char >= '0' && right_char <= '9')
-							{
-								int left_num = left_char - '0';
-								int right_num = right_char - '0';
-								
-								left_index++;
-								right_index++;
-								while(true)
-								{
-									left_char = left.charAt(left_index);
-									
-									if(left_char >= '0' && left_char <= '9')
-									{
-										left_num = left_num * 10 + left_char - '0';
-										left_index++;
-									}
-									else
-									{
-										break;
-									}
-								}
-								while(true)
-								{
-									right_char = right.charAt(right_index);
-									
-									if(right_char >= '0' && right_char <= '9')
-									{
-										right_num = right_num * 10 + right_char - '0';
-										right_index++;
-									}
-									else
-									{
-										break;
-									}
-								}
-								if(left_num != right_num) {return(left_num - right_num);}
-							}
-							else
-							{
-								return(left_char - right_char);
-							}
-						}
-						
-						if(left_index < left.length()) {return(-1);}
-						if(right_index < right.length()) {return(1);}
-						return(0);
-					}
-				});
+			org.zenu.bookreader.Path.sortWindowsFileName(xs);
 			files_ = xs.toArray(new String[0]);
 		}
 		return(files_);

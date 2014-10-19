@@ -2,6 +2,7 @@ package org.zenu.bookreader;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import android.app.Activity;
@@ -36,11 +37,14 @@ public class Bookshelf
 	public void createShelf(String shelf_name)
 	{
 		setTitle(shelf_name);
+		List<Book> books = getBooks(shelf_name);
+		if(books == null) {return;}
+		
 		final GridView grid = (GridView) findViewById(R.id.shelf);
 		
 		final LayoutInflater inflater_ = getLayoutInflater();
 		
-		grid.setAdapter(new ArrayAdapter<Book>(this, 0, getBooks(shelf_name))
+		grid.setAdapter(new ArrayAdapter<Book>(this, 0, books)
 			{
 				@Override
 				public View getView(int position, View convertView, ViewGroup parent)
@@ -103,10 +107,11 @@ public class Bookshelf
 	
 	public List<Book> getBooks(String shelf_name)
 	{
-		List<Book> xs = new ArrayList<Book>();
+		File[] files = new File(shelf_name).listFiles();
+		if(files == null) {return(null);}
 		
-		File dir = new File(shelf_name);
-		for(File f : dir.listFiles())
+		List<Book> xs = new ArrayList<Book>();
+		for(File f : Path.sortWindowsFolder(Arrays.asList(files)))
 		{
 			if(f.isDirectory())
 			{
