@@ -17,6 +17,7 @@ import android.view.ScaleGestureDetector;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.Toast;
 import android.widget.ImageView.ScaleType;
 
@@ -60,10 +61,16 @@ public class BookViewer
 			book_ = null;
 		}
 	}
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
 		getMenuInflater().inflate(R.menu.bookviewer, menu);
+		
+		SeekBar seek = (SeekBar) menu.findItem(R.id.page_seek).getActionView().findViewById(R.id.seek);
+		seek.setMax(book_.getMaxPage());
+		seek.setProgress(book_.getPageIndex());
+		
 		return(super.onCreateOptionsMenu(menu));
 	}
 	
