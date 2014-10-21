@@ -14,12 +14,11 @@
         android:allowBackup="true"
         android:icon="@android:drawable/ic_menu_gallery"
         android:label="@string/app_name"
+        android:theme="@android:style/Theme.Holo.Light"
         >
         
         <activity
             android:name="Bookshelf"
-            android:launchMode="singleInstance"
-            android:theme="@android:style/Theme.Light"
             >
             
             <intent-filter>
@@ -30,7 +29,8 @@
         
         <activity
             android:name="BookViewer"
-            android:theme="@android:style/Theme.Light.NoTitleBar"
+            android:uiOptions="splitActionBarWhenNarrow"
+            android:theme="@style/Theme.Holo.Light.WithTranslucentActionBar"
             />
     </application>
 

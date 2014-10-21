@@ -2,15 +2,20 @@ package org.zenu.bookreader;
 
 import java.util.List;
 
+import android.app.ActionBar;
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.GestureDetector;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.ViewTreeObserver;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.Toast;
 import android.widget.ImageView.ScaleType;
@@ -26,7 +31,14 @@ public class BookViewer
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		setContentView(R.layout.bookviewer);
+		ActionBar x = getActionBar();
+		if(x != null)
+		{
+			x.setDisplayHomeAsUpEnabled(true);
+			x.hide();
+		}
 		
 		String path = getIntent().getStringExtra(BookViewer.class.getName() + ".path");
 		createViewer();
@@ -47,6 +59,39 @@ public class BookViewer
 			book_.close();
 			book_ = null;
 		}
+	}
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu)
+	{
+		getMenuInflater().inflate(R.menu.bookviewer, menu);
+		return(super.onCreateOptionsMenu(menu));
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		switch(item.getItemId())
+		{
+		case android.R.id.home:
+			finish();
+			break;
+			
+		case R.id.back_to_shelf:
+			Intent intent = new Intent(this, Bookshelf.class);
+			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);
+			break;
+			
+		case R.id.bookmarks:
+			break;
+			
+		case R.id.add_bookmark:
+			break;
+			
+		case R.id.remove_bookmark:
+			break;
+		}
+		return(super.onOptionsItemSelected(item));
 	}
 	
 	private ScaleGestureDetector scale_dector_;
@@ -87,11 +132,10 @@ public class BookViewer
 		
 		fling_dector_ = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener()
 			{
-				@Override
-				public boolean onSingleTapUp(MotionEvent event)
+				public boolean onSingleTapConfirmed(MotionEvent e)
 				{
 					// とりあえず右綴じ想定でビューの左2/3をタッチでページ送り、右1/3をタッチでページ戻り
-					if(event.getX() - image_.getLeft() < image_.getWidth() * 2 / 3)
+					if(e.getX() - image_.getLeft() < image_.getWidth() * 2 / 3)
 					{
 						moveNextPage();
 					}
@@ -99,7 +143,7 @@ public class BookViewer
 					{
 						movePrevPage();
 					}
-					return(super.onSingleTapUp(event));
+					return(super.onSingleTapConfirmed(e));
 				}
 				
 				@Override
@@ -110,6 +154,24 @@ public class BookViewer
 					image_.setImageMatrix(x);
 					image_.invalidate();
 					return(super.onScroll(e1, e2, distanceX, distanceY));
+				}
+				
+				@Override
+				public boolean onDoubleTap(MotionEvent e)
+				{
+					ActionBar x = getActionBar();
+					if(x != null)
+					{
+						if(x.isShowing())
+						{
+							x.hide();
+						}
+						else
+						{
+							x.show();
+						}
+					}
+					return(super.onDoubleTap(e));
 				}
 			});
 	}
@@ -144,6 +206,7 @@ public class BookViewer
 		image_.setImageDrawable(p);
 		if(book_ != null) {book_.close();}
 		book_ = book;
+		setTitle(book_.getTitle());
 		return(true);
 	}
 	
