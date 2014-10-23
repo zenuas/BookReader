@@ -15,6 +15,7 @@ public class Strings
 		}
 		return(x.toString());
 	}
+	
 	public static String join(List<String> xs, String separator)
 	{
 		StringBuilder x = new StringBuilder();
@@ -26,9 +27,9 @@ public class Strings
 		return(x.toString());
 	}
 	
-	public static List<String> filter(String[] xs, Func1<String, Boolean> f)
+	public static <T> List<T> filter(T[] xs, Func1<T, Boolean> f)
 	{
-		List<String> xxs = new ArrayList<String>();
+		List<T> xxs = new ArrayList<T>();
 		for(int i = 0; i < xs.length; i++)
 		{
 			if(f.invoke(xs[i])) {xxs.add(xs[i]);}
@@ -36,20 +37,20 @@ public class Strings
 		return(xxs);
 	}
 	
-	public static List<String> filter(List<String> xs, Func1<String, Boolean> f)
+	public static <T> List<T> filter(List<T> xs, Func1<T, Boolean> f)
 	{
-		List<String> xxs = new ArrayList<String>();
+		List<T> xxs = new ArrayList<T>();
 		for(int i = 0; i < xs.size(); i++)
 		{
-			String s = xs.get(i);
+			T s = xs.get(i);
 			if(f.invoke(s)) {xxs.add(s);}
 		}
 		return(xxs);
 	}
 	
-	public static List<String> map(String[] xs, Func1<String, String> f)
+	public static <T, TR> List<TR> map(T[] xs, Func1<T, TR> f)
 	{
-		List<String> xxs = new ArrayList<String>();
+		List<TR> xxs = new ArrayList<TR>();
 		for(int i = 0; i < xs.length; i++)
 		{
 			xxs.add(f.invoke(xs[i]));
@@ -57,9 +58,9 @@ public class Strings
 		return(xxs);
 	}
 	
-	public static List<String> map(List<String> xs, Func1<String, String> f)
+	public static <T, TR> List<TR> map(List<T> xs, Func1<T, TR> f)
 	{
-		List<String> xxs = new ArrayList<String>();
+		List<TR> xxs = new ArrayList<TR>();
 		for(int i = 0; i < xs.size(); i++)
 		{
 			xxs.add(f.invoke(xs.get(i)));
@@ -67,7 +68,7 @@ public class Strings
 		return(xxs);
 	}
 	
-	public static <T> T foldLeft(String[] xs, Func2<T, String, T> f, T r)
+	public static <T, TR> TR foldLeft(T[] xs, Func2<TR, T, TR> f, TR r)
 	{
 		for(int i = 0; i < xs.length; i++)
 		{
@@ -76,7 +77,7 @@ public class Strings
 		return(r);
 	}
 	
-	public static <T> T foldLeft(List<String> xs, Func2<T, String, T> f, T r)
+	public static <T, TR> TR foldLeft(List<T> xs, Func2<TR, T, TR> f, TR r)
 	{
 		for(int i = 0; i < xs.size(); i++)
 		{
@@ -85,7 +86,7 @@ public class Strings
 		return(r);
 	}
 	
-	public static <T> T foldRight(String[] xs, Func2<T, String, T> f, T r)
+	public static <T, TR> TR foldRight(T[] xs, Func2<TR, T, TR> f, TR r)
 	{
 		for(int i = xs.length - 1; xs.length > 0; i--)
 		{
@@ -94,7 +95,7 @@ public class Strings
 		return(r);
 	}
 	
-	public static <T> T foldRight(List<String> xs, Func2<T, String, T> f, T r)
+	public static <T, TR> TR foldRight(List<T> xs, Func2<TR, T, TR> f, TR r)
 	{
 		for(int i = xs.size() - 1; i > 0; i--)
 		{

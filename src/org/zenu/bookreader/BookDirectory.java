@@ -17,7 +17,7 @@ public class BookDirectory
 	@Override
 	public Drawable getCover()
 	{
-		return(null);
+		return(ApplicationContext.getContext().getResources().getDrawable(android.R.drawable.ic_menu_gallery));
 	}
 	
 	@Override

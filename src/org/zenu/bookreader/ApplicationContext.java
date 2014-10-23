@@ -21,9 +21,16 @@ public class ApplicationContext
 	public void onCreate()
 	{
 		super.onCreate();
+		self_ = this;
 		registerBugReport();
 		
 		db_ = new BookCacheDB(this);
+	}
+	
+	private static ApplicationContext self_ = null;
+	public static ApplicationContext getContext()
+	{
+		return(self_);
 	}
 	
 	private BookCacheDB db_;
