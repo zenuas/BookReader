@@ -10,6 +10,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -30,18 +32,81 @@ public class Bookshelf
 		
 		ApplicationContext app = (ApplicationContext) getApplicationContext();
 		app.sendBugReport();
-		
-		createShelf(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Books");
-	}
 
-	public void createShelf(String shelf_name)
+		createShelf();
+		setupShelf(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Books");
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu)
+	{
+		getMenuInflater().inflate(R.menu.bookshelf, menu);
+		return(super.onCreateOptionsMenu(menu));
+	}
+	
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu)
+	{
+		menu.removeGroup(R.id.shelves);
+		
+		List<String> shelves = BookShelvesManager.getShelves(this);
+		for(int i = 0; i < shelves.size(); i++)
+		{
+			String s = shelves.get(i);
+			MenuItem x = menu.add(R.id.shelves, i, 0, s);
+			x.setChecked((i == 0 && current_shelf_.length() == 0) || (current_shelf_.equals(s)));
+		}
+		return(super.onPrepareOptionsMenu(menu));
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		switch(item.getItemId())
+		{
+		case R.id.add_shelf:
+			break;
+		case R.id.list_bookmark:
+			break;
+		case R.id.list_history:
+			break;
+			
+		default:
+			setupShelf((String) item.getTitle());
+			break;
+		}
+		return(super.onOptionsItemSelected(item));
+	}
+	
+	public void createShelf()
+	{
+		final GridView grid = (GridView) findViewById(R.id.shelf);
+		
+		grid.setOnItemClickListener(new AdapterView.OnItemClickListener()
+			{
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+				{
+					Book book = (Book) parent.getItemAtPosition(position);
+					
+					Intent intent = new Intent();
+					intent.setClass(Bookshelf.this, BookViewer.class);
+					intent.putExtra(BookViewer.class.getName() + ".path", book.Path);
+					
+					Bookshelf.this.startActivity(intent);
+				}
+			});
+	}
+	
+	private String current_shelf_ = ""; 
+	public void setupShelf(String shelf_name)
 	{
 		setTitle(shelf_name);
 		List<Book> books = getBooks(shelf_name, true);
 		if(books == null) {return;}
+		current_shelf_ = shelf_name;
 		
 		final GridView grid = (GridView) findViewById(R.id.shelf);
-		
 		final LayoutInflater inflater_ = getLayoutInflater();
 		
 		grid.setAdapter(new ArrayAdapter<Book>(this, 0, books)
@@ -88,21 +153,6 @@ public class Bookshelf
 					}
 					
 					return(convertView);
-				}
-			});
-		
-		grid.setOnItemClickListener(new AdapterView.OnItemClickListener()
-			{
-				@Override
-				public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-				{
-					Book book = (Book) parent.getItemAtPosition(position);
-					
-					Intent intent = new Intent();
-					intent.setClass(Bookshelf.this, BookViewer.class);
-					intent.putExtra(BookViewer.class.getName() + ".path", book.Path);
-					
-					Bookshelf.this.startActivity(intent);
 				}
 			});
 	}

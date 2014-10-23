@@ -34,7 +34,6 @@ public class ApplicationContext
 	
 	public void registerBugReport()
 	{
-		
 		final SharedPreferences pref = getSharedPreferences(getClass().getName(), MODE_PRIVATE);
 		
 		final UncaughtExceptionHandler defaultUncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler();

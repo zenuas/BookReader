@@ -112,7 +112,7 @@ public class BookViewer
 	{
 		MenuItem ltor = (MenuItem) menu.findItem(R.id.left_to_right);
 		MenuItem rtol = (MenuItem) menu.findItem(R.id.right_to_left);
-		if(book_.getDirection() == Direction.LeftToRight)
+		if(book_ != null && book_.getDirection() == Direction.LeftToRight)
 		{
 			ltor.setVisible(false);
 			rtol.setVisible(true);
