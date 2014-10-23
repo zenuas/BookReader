@@ -19,7 +19,7 @@ class BookCacheDB
 	
 	public void onCreate(SQLiteDatabase db)
 	{
-		db.execSQL("create table BookCache (path text primary key, cover blob, page text, pageindex int, maxpage int, left_to_right int, spread int, lastmodified int);");
+		db.execSQL("create table BookCache (path text primary key, cover blob, page text, pageindex int, maxpage int, direction int, spread int, lastmodified int);");
 	}
 	
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
@@ -55,8 +55,9 @@ class BookCacheDB
 				if(d == book.getLastModified())
 				{
 					book.Page = c.getString(c.getColumnIndex("page"));
-					book.setPageIndex(c.getInt(c.getColumnIndex("pageindex")));
+					//book.setPageIndex(c.getInt(c.getColumnIndex("pageindex")));
 					book.setMaxPage(c.getInt(c.getColumnIndex("maxpage")));
+					book.setDirection(Direction.valueOf(c.getInt(c.getColumnIndex("direction"))));
 					book.setLastModified(d);
 					book.deserializeCover(c.getBlob(c.getColumnIndex("cover")));
 				}
@@ -85,6 +86,7 @@ class BookCacheDB
 		values.put("page", book.Page);
 		values.put("pageindex", book.getPageIndex());
 		values.put("maxpage", book.getMaxPage());
+		values.put("direction", book.getDirection().getId());
 		values.put("lastmodified", book.getLastModified());
 		db.insert("BookCache", null, values);
 	}

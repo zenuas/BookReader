@@ -31,5 +31,13 @@
         android:title="@string/remove_bookmark"
         android:visible="false"
         />
+    <item
+        android:id="@+id/left_to_right"
+        android:title="@string/left_to_right"
+        />
+    <item
+        android:id="@+id/right_to_left"
+        android:title="@string/right_to_left"
+        />
 
 </menu>

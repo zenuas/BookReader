@@ -85,7 +85,7 @@ public class BookViewer
 						
 						book_.setPageIndex(progress);
 						image_.setImageDrawable(book_.currentPage());
-						((ApplicationContext) getApplicationContext()).getDB().saveBook(book_);
+						saveBook();
 					}
 					catch(Exception e)
 					{
@@ -105,6 +105,24 @@ public class BookViewer
 			});
 		
 		return(super.onCreateOptionsMenu(menu));
+	}
+	
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu)
+	{
+		MenuItem ltor = (MenuItem) menu.findItem(R.id.left_to_right);
+		MenuItem rtol = (MenuItem) menu.findItem(R.id.right_to_left);
+		if(book_.getDirection() == Direction.LeftToRight)
+		{
+			ltor.setVisible(false);
+			rtol.setVisible(true);
+		}
+		else
+		{
+			ltor.setVisible(true);
+			rtol.setVisible(false);
+		}
+		return(super.onPrepareOptionsMenu(menu));
 	}
 	
 	@Override
@@ -129,6 +147,18 @@ public class BookViewer
 			break;
 			
 		case R.id.remove_bookmark:
+			break;
+
+		case R.id.left_to_right:
+			book_.setDirection(Direction.LeftToRight);
+			saveBook();
+			setActionBarVisible(true);
+			break;
+			
+		case R.id.right_to_left:
+			book_.setDirection(Direction.RightToLeft);
+			saveBook();
+			setActionBarVisible(true);
 			break;
 		}
 		return(super.onOptionsItemSelected(item));
@@ -174,14 +204,31 @@ public class BookViewer
 			{
 				public boolean onSingleTapConfirmed(MotionEvent e)
 				{
-					// とりあえず右綴じ想定でビューの左2/3をタッチでページ送り、右1/3をタッチでページ戻り
-					if(e.getX() - image_.getLeft() < image_.getWidth() * 2 / 3)
+					if(book_.getDirection() == Direction.LeftToRight)
 					{
-						moveNextPage();
+						// 左綴の場合、ビューの左1/3をタッチでページ戻り、右2/3をタッチでページ送り
+						int center = image_.getWidth() * 1 / 3;
+						if(e.getX() - image_.getLeft() < center)
+						{
+							movePrevPage();
+						}
+						else
+						{
+							moveNextPage();
+						}
 					}
 					else
 					{
-						movePrevPage();
+						// 右綴の場合、ビューの左2/3をタッチでページ送り、右1/3をタッチでページ戻り
+						int center = image_.getWidth() * 2 / 3;
+						if(e.getX() - image_.getLeft() < center)
+						{
+							moveNextPage();
+						}
+						else
+						{
+							movePrevPage();
+						}
 					}
 					return(super.onSingleTapConfirmed(e));
 				}
@@ -324,7 +371,7 @@ public class BookViewer
 				Toast.makeText(this, book_.getTitle(), Toast.LENGTH_SHORT).show();
 			}
 			image_.setImageDrawable(book_.currentPage());
-			((ApplicationContext) getApplicationContext()).getDB().saveBook(book_);
+			saveBook();
 		}
 		catch(Exception e)
 		{
@@ -352,7 +399,7 @@ public class BookViewer
 				Toast.makeText(this, book_.getTitle(), Toast.LENGTH_SHORT).show();
 			}
 			image_.setImageDrawable(book_.currentPage());
-			((ApplicationContext) getApplicationContext()).getDB().saveBook(book_);
+			saveBook();
 		}
 		catch(Exception e)
 		{
@@ -368,6 +415,17 @@ public class BookViewer
 			if(visible)
 			{
 				x.show();
+				SeekBar seek = (SeekBar) findViewById(R.id.seek);
+				if(book_.getDirection() == Direction.LeftToRight)
+				{
+					seek.setRotation(0);
+				}
+				else
+				{
+					seek.setRotation(180);
+				}
+				seek.setMax(book_.getMaxPage());
+				seek.setProgress(book_.getPageIndex());
 			}
 			else
 			{
@@ -382,19 +440,13 @@ public class BookViewer
 		ActionBar x = getActionBar();
 		if(x != null)
 		{
-			if(x.isShowing())
-			{
-				x.hide();
-			}
-			else
-			{
-				x.show();
-				SeekBar seek = (SeekBar) findViewById(R.id.seek);
-				seek.setRotation(180);
-				seek.setMax(book_.getMaxPage());
-				seek.setProgress(book_.getPageIndex());
-			}
+			setActionBarVisible(!x.isShowing());
 		}
 		return(x);
+	}
+	
+	public void saveBook()
+	{
+		((ApplicationContext) getApplicationContext()).getDB().saveBook(book_);
 	}
 }

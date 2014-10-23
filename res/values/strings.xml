@@ -11,5 +11,7 @@
     <string name="bookmarks">しおりの一覧</string>
     <string name="add_bookmark">しおりを付ける</string>
     <string name="remove_bookmark">しおりを外す</string>
+    <string name="left_to_right">左綴じにする</string>
+    <string name="right_to_left">右綴じにする</string>
 
 </resources>

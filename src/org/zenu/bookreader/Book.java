@@ -15,6 +15,7 @@ public abstract class Book
 	public String Path;
 	public Drawable Cover = null;
 	public String Page = "";
+	private Direction direct_ = Direction.RightToLeft;
 	
 	public Book(String path)
 	{
@@ -58,6 +59,16 @@ public abstract class Book
 			return;
 		}
 		Cover = new BitmapDrawable(context.getResources(), BitmapFactory.decodeByteArray(data, 0, data.length));
+	}
+	
+	public Direction getDirection()
+	{
+		return(direct_);
+	}
+	
+	public void setDirection(Direction direct)
+	{
+		direct_ = direct;
 	}
 	
 	public abstract Drawable getCover();
