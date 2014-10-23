@@ -95,7 +95,17 @@ public class BookZipArchive
 	@Override
 	public Drawable currentPage() throws Exception
 	{
-		if(Page.equals("")) {moveFirstPage();}
+		if(Page.equals(""))
+		{
+			if(page_index_ >= 0)
+			{
+				Page = getArchiveFiles()[page_index_];
+			}
+			else
+			{
+				moveFirstPage();
+			}
+		}
 		
 		ZipFile zip = getArchive();
 		return(Drawable.createFromStream(zip.getInputStream(zip.getEntry(Page)), Page));
@@ -204,7 +214,7 @@ public class BookZipArchive
 	public void setPageIndex(int page)
 	{
 		page_index_ = page;
-		if(!fileLoaded()) {return;}
+		if(!fileLoaded()) {Page = ""; return;}
 		try
 		{
 			movePage(getArchiveFiles()[page]);

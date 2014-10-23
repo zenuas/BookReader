@@ -63,6 +63,8 @@ public class BookViewer
 		}
 	}
 	
+	private Toast toast_ = null;
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
@@ -74,8 +76,13 @@ public class BookViewer
 				@Override
 				public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
 				{
+					if(!fromUser) {return;}
 					try
 					{
+						if(toast_ != null) {toast_.cancel();}
+						toast_ = Toast.makeText(BookViewer.this, String.valueOf(progress + 1) + " / " + String.valueOf(seekBar.getMax()), Toast.LENGTH_SHORT);
+						toast_.show();
+						
 						book_.setPageIndex(progress);
 						image_.setImageDrawable(book_.currentPage());
 						((ApplicationContext) getApplicationContext()).getDB().saveBook(book_);
@@ -383,6 +390,7 @@ public class BookViewer
 			{
 				x.show();
 				SeekBar seek = (SeekBar) findViewById(R.id.seek);
+				seek.setRotation(180);
 				seek.setMax(book_.getMaxPage());
 				seek.setProgress(book_.getPageIndex());
 			}
