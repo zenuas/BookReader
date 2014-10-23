@@ -19,7 +19,7 @@ class BookCacheDB
 	
 	public void onCreate(SQLiteDatabase db)
 	{
-		db.execSQL("create table BookCache (path text primary key, cover blob, page text, pageindex int, maxpage int, lastmodified int);");
+		db.execSQL("create table BookCache (path text primary key, cover blob, page text, pageindex int, maxpage int, left_to_right int, spread int, lastmodified int);");
 	}
 	
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)

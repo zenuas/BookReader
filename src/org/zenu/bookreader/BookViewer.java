@@ -18,6 +18,7 @@ import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Toast;
 import android.widget.ImageView.ScaleType;
 
@@ -68,8 +69,33 @@ public class BookViewer
 		getMenuInflater().inflate(R.menu.bookviewer, menu);
 		
 		SeekBar seek = (SeekBar) menu.findItem(R.id.page_seek).getActionView().findViewById(R.id.seek);
-		seek.setMax(book_.getMaxPage());
-		seek.setProgress(book_.getPageIndex());
+		seek.setOnSeekBarChangeListener(new OnSeekBarChangeListener()
+			{
+				@Override
+				public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
+				{
+					try
+					{
+						book_.setPageIndex(progress);
+						image_.setImageDrawable(book_.currentPage());
+						((ApplicationContext) getApplicationContext()).getDB().saveBook(book_);
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+					}
+				}
+				
+				@Override
+				public void onStartTrackingTouch(SeekBar seekBar)
+				{
+				}
+				
+				@Override
+				public void onStopTrackingTouch(SeekBar seekBar)
+				{
+				}
+			});
 		
 		return(super.onCreateOptionsMenu(menu));
 	}
@@ -166,18 +192,7 @@ public class BookViewer
 				@Override
 				public boolean onDoubleTap(MotionEvent e)
 				{
-					ActionBar x = getActionBar();
-					if(x != null)
-					{
-						if(x.isShowing())
-						{
-							x.hide();
-						}
-						else
-						{
-							x.show();
-						}
-					}
+					setActionBarVisibleToggle();
 					return(super.onDoubleTap(e));
 				}
 			});
@@ -280,6 +295,7 @@ public class BookViewer
 	
 	public void moveNextPage()
 	{
+		setActionBarVisible(false);
 		try
 		{
 			if(!book_.moveNextPage())
@@ -311,6 +327,7 @@ public class BookViewer
 	
 	public void movePrevPage()
 	{
+		setActionBarVisible(false);
 		try
 		{
 			if(!book_.movePrevPage())
@@ -334,5 +351,42 @@ public class BookViewer
 		{
 			e.printStackTrace();
 		}
+	}
+	
+	public ActionBar setActionBarVisible(boolean visible)
+	{
+		ActionBar x = getActionBar();
+		if(x != null)
+		{
+			if(visible)
+			{
+				x.show();
+			}
+			else
+			{
+				x.hide();
+			}
+		}
+		return(x);
+	}
+	
+	public ActionBar setActionBarVisibleToggle()
+	{
+		ActionBar x = getActionBar();
+		if(x != null)
+		{
+			if(x.isShowing())
+			{
+				x.hide();
+			}
+			else
+			{
+				x.show();
+				SeekBar seek = (SeekBar) findViewById(R.id.seek);
+				seek.setMax(book_.getMaxPage());
+				seek.setProgress(book_.getPageIndex());
+			}
+		}
+		return(x);
 	}
 }

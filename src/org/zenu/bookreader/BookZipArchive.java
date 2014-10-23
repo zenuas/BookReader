@@ -204,6 +204,15 @@ public class BookZipArchive
 	public void setPageIndex(int page)
 	{
 		page_index_ = page;
+		if(!fileLoaded()) {return;}
+		try
+		{
+			movePage(getArchiveFiles()[page]);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 	
 	@Override
