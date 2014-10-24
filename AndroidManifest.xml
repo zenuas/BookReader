@@ -32,6 +32,10 @@
             android:uiOptions="splitActionBarWhenNarrow"
             android:theme="@style/Theme.Holo.Light.WithTranslucentActionBar"
             />
+        
+        <activity
+            android:name="ShelfList"
+            />
     </application>
 
 </manifest>

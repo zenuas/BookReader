@@ -34,7 +34,11 @@ public class Bookshelf
 		app.sendBugReport();
 
 		createShelf();
-		setupShelf(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Books");
+		List<String> shelves = BookShelvesManager.getShelves(this);
+		if(shelves.size() > 0)
+		{
+			setupShelf(shelves.get(0));
+		}
 	}
 	
 	@Override
@@ -56,6 +60,7 @@ public class Bookshelf
 			MenuItem x = menu.add(R.id.shelves, i, 0, s);
 			x.setChecked((i == 0 && current_shelf_.length() == 0) || (current_shelf_.equals(s)));
 		}
+		menu.setGroupCheckable(R.id.shelves, true, true);
 		return(super.onPrepareOptionsMenu(menu));
 	}
 	
@@ -65,6 +70,7 @@ public class Bookshelf
 		switch(item.getItemId())
 		{
 		case R.id.add_shelf:
+			startActivity(new Intent(this, ShelfList.class));
 			break;
 		case R.id.list_bookmark:
 			break;

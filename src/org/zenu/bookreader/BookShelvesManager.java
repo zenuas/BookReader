@@ -1,7 +1,6 @@
 package org.zenu.bookreader;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import android.content.Context;
@@ -14,7 +13,7 @@ public class BookShelvesManager
 	{
 		SharedPreferences pref = context.getSharedPreferences(BookShelvesManager.class.getName(), Context.MODE_PRIVATE);
 		String shelves = pref.getString("Shelves", "");
-		return(shelves.length() == 0 ? new ArrayList<String>() : Arrays.asList(shelves.split("\n")));
+		return(shelves.length() == 0 ? new ArrayList<String>() : Lists.toList(shelves.split("\n")));
 	}
 	
 	public static void addShelves(Context context, String path)
@@ -32,7 +31,7 @@ public class BookShelvesManager
 	{
 		final String path_ = path;
 		List<String> shelves = getShelves(context);
-		shelves = Strings.filter(shelves, new Func1<String, Boolean>()
+		shelves = Lists.filter(shelves, new Func1<String, Boolean>()
 			{
 				@Override
 				public Boolean invoke(String a1)

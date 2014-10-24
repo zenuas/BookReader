@@ -34,27 +34,31 @@ public final class R {
         public static final int bookviewer=0x7f020001;
         public static final int item=0x7f020002;
         public static final int pageseek=0x7f020003;
+        public static final int shelf_item=0x7f020004;
+        public static final int shelflist=0x7f020005;
     }
     public static final class menu {
         public static final int bookshelf=0x7f050000;
         public static final int bookviewer=0x7f050001;
+        public static final int shelflist=0x7f050002;
     }
     public static final class string {
-        public static final int add_bookmark=0x7f030008;
-        public static final int add_shelf=0x7f03000c;
+        public static final int add_bookmark=0x7f030009;
+        public static final int add_shelf=0x7f03000d;
         public static final int app_name=0x7f030000;
-        public static final int back_to_shelf=0x7f030006;
-        public static final int bookmarks=0x7f030007;
-        public static final int bookviewer_fileopenerror=0x7f030002;
+        public static final int back_to_shelf=0x7f030007;
+        public static final int bookmarks=0x7f030008;
+        public static final int bookviewer_fileopenerror=0x7f030003;
+        public static final int directoy_access_denied=0x7f030002;
         public static final int icon=0x7f030001;
-        public static final int left_to_right=0x7f03000a;
-        public static final int list_bookmark=0x7f03000d;
-        public static final int list_history=0x7f03000e;
-        public static final int nextbook_not_found=0x7f030003;
-        public static final int page_seek=0x7f030005;
-        public static final int prevbook_not_found=0x7f030004;
-        public static final int remove_bookmark=0x7f030009;
-        public static final int right_to_left=0x7f03000b;
+        public static final int left_to_right=0x7f03000b;
+        public static final int list_bookmark=0x7f03000e;
+        public static final int list_history=0x7f03000f;
+        public static final int nextbook_not_found=0x7f030004;
+        public static final int page_seek=0x7f030006;
+        public static final int prevbook_not_found=0x7f030005;
+        public static final int remove_bookmark=0x7f03000a;
+        public static final int right_to_left=0x7f03000c;
     }
     public static final class style {
         public static final int Theme_Holo_Light_WithTranslucentActionBar=0x7f040000;

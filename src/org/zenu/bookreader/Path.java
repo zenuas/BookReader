@@ -7,17 +7,15 @@ import java.util.List;
 
 public class Path
 {
-	public static final char PathSeparator = '/';
-	
 	public static String getDirectoryName(String path)
 	{
-		int dir = path.lastIndexOf(PathSeparator);
+		int dir = path.lastIndexOf(File.separator);
 		return(dir >= 0 ? path.substring(0, dir + 1) : "");
 	}
 	
 	public static String getFileName(String path)
 	{
-		int dir = path.lastIndexOf(PathSeparator);
+		int dir = path.lastIndexOf(File.separator);
 		return(dir >= 0 ? path.substring(dir + 1) : path);
 	}
 	
@@ -76,5 +74,24 @@ public class Path
 			};
 		Collections.sort(xs, compare);
 		return(xs);
+	}
+	
+	public static String combine(String left, String right)
+	{
+		// ToDo:
+		//   leftの末尾がディレクトリセパレータの場合はセパレータが2重にならないほうが望ましい
+		//   leftが空文字の場合はカレントディレクトリ(".")を表すのが望ましい
+		//   rightがルートディレクトリから始まる場合はleftを無視するのが望ましい
+		//   rightが"."や".."については一意のパスに直すのが望ましい
+		//   実際のファイルの有無は問わず単なる文字列操作でないといけない
+		// 面倒なのは無視している
+		if(left.length() > 0 && left.charAt(left.length() - 1) == File.separatorChar)
+		{
+			return(left + right);
+		}
+		else
+		{
+			return(left + File.separator + right);
+		}
 	}
 }
