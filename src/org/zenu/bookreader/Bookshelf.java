@@ -36,7 +36,8 @@ public class Bookshelf
 		List<String> shelves = BookShelvesManager.getShelves(this);
 		if(shelves.size() > 0)
 		{
-			setupShelf(shelves.get(0));
+			String shelf = shelves.get(0);
+			setupShelf(shelf, shelf);
 		}
 	}
 	
@@ -77,10 +78,26 @@ public class Bookshelf
 			break;
 			
 		default:
-			setupShelf((String) item.getTitle());
+			String shelf = (String) item.getTitle();
+			setupShelf(shelf, shelf);
 			break;
 		}
 		return(super.onOptionsItemSelected(item));
+	}
+	
+	@Override
+	public void onBackPressed()
+	{
+		String parent = Path.getDirectoryName(current_shelf_indir_);
+		parent = (parent.length() > 0 && parent.charAt(parent.length() - 1) == File.separatorChar ? parent.substring(0, parent.length() - 1) : parent);
+		if(parent.startsWith(current_shelf_))
+		{
+			setupShelf(current_shelf_, parent);
+		}
+		else
+		{
+			super.onBackPressed();
+		}
 	}
 	
 	public void createShelf()
@@ -94,22 +111,33 @@ public class Bookshelf
 				{
 					Book book = (Book) parent.getItemAtPosition(position);
 					
-					Intent intent = new Intent();
-					intent.setClass(Bookshelf.this, BookViewer.class);
-					intent.putExtra(BookViewer.class.getName() + ".path", book.Path);
-					
-					Bookshelf.this.startActivity(intent);
+					if(book instanceof BookDirectory)
+					{
+						setupShelf(current_shelf_, book.Path);
+					}
+					else
+					{
+						Intent intent = new Intent();
+						intent.setClass(Bookshelf.this, BookViewer.class);
+						intent.putExtra(BookViewer.class.getName() + ".path", book.Path);
+						
+						Bookshelf.this.startActivity(intent);
+					}
 				}
 			});
 	}
-	
+
 	private String current_shelf_ = ""; 
-	public void setupShelf(String shelf_name)
+	private String current_shelf_indir_ = ""; 
+	public void setupShelf(String shelf_name, String indir)
 	{
-		setTitle(shelf_name);
-		List<Book> books = getBooks(shelf_name, true);
+		if(!indir.startsWith(shelf_name)) {return;}
+		
+		setTitle(indir);
+		List<Book> books = getBooks(indir, true);
 		if(books == null) {return;}
 		current_shelf_ = shelf_name;
+		current_shelf_indir_ = indir;
 		
 		final GridView grid = (GridView) findViewById(R.id.shelf);
 		final LayoutInflater inflater_ = getLayoutInflater();
