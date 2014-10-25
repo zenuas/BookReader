@@ -1,0 +1,24 @@
+<resources>
+
+    <string name="app_name">BookReader</string>
+    <string name="icon"></string>
+    
+    <string name="directoy_access_denied">Directory access denied</string>
+    
+    <string name="bookviewer_fileopenerror">本が開けません。</string>
+    <string name="nextbook_not_found">次の本が見つかりません。</string>
+    <string name="prevbook_not_found">前の本が見つかりません。</string>
+    <string name="page_seek"></string>
+    <string name="back_to_shelf">本棚へ</string>
+    <string name="bookmarks">しおりの一覧</string>
+    <string name="add_bookmark">しおりを付ける</string>
+    <string name="remove_bookmark">しおりを外す</string>
+    <string name="left_to_right">左綴じにする</string>
+    <string name="right_to_left">右綴じにする</string>
+    
+    <string name="manage_shelf">本棚管理</string>
+    <string name="add_shelf">本棚を追加</string>
+    <string name="list_bookmark">しおり</string>
+    <string name="list_history">履歴</string>
+
+</resources>
