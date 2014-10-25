@@ -4,19 +4,23 @@ import java.util.List;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.ProgressDialog;
+import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Rect;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.Display;
 import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -410,22 +414,41 @@ public class BookViewer
 			e.printStackTrace();
 		}
 	}
-	
+
+	private Dialog wait_ = null;
+	private Handler handler_ = null;
+	private Runnable wait_delay_ = null;
 	public void updateCanvas(Book book) throws Exception
 	{
+		if(wait_ == null)
+		{
+			wait_ = new Dialog(this);
+			wait_.requestWindowFeature(Window.FEATURE_NO_TITLE);
+			wait_.setContentView(R.layout.progress);
+			wait_.getWindow().setFlags(0, WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+			wait_.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+			wait_.setCanceledOnTouchOutside(false);
+			
+			handler_ = new Handler();
+			wait_delay_ = new Runnable()
+				{
+					@Override
+					public void run()
+					{
+						wait_.show();
+					}
+				};
+		}
+		
 		new AsyncTask<Book, Integer, Drawable>()
 			{
 				private int size_;
-				private ProgressDialog wait_;
 				
 				@Override
 				protected void onPreExecute()
 				{
 					size_ = getCanvasSize();
-					
-					wait_ = new ProgressDialog(BookViewer.this);
-					wait_.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-					wait_.show();
+					handler_.postDelayed(wait_delay_, 500);
 				}
 				
 				@Override
@@ -433,6 +456,7 @@ public class BookViewer
 				{
 					try
 					{
+						Thread.sleep(5000);
 						return(params[0].currentPage(size_, size_));
 					}
 					catch(Exception e)
@@ -453,6 +477,7 @@ public class BookViewer
 				protected void onPostExecute(Drawable result)
 				{
 					image_.setImageDrawable(result);
+					handler_.removeCallbacks(wait_delay_);
 					wait_.dismiss();
 					setAutoRotateAndFitScaleAndCenter();
 					saveBook();

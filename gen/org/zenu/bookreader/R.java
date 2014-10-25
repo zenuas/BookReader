@@ -36,8 +36,9 @@ public final class R {
         public static final int bookviewer=0x7f020001;
         public static final int item=0x7f020002;
         public static final int pageseek=0x7f020003;
-        public static final int shelf_item=0x7f020004;
-        public static final int shelflist=0x7f020005;
+        public static final int progress=0x7f020004;
+        public static final int shelf_item=0x7f020005;
+        public static final int shelflist=0x7f020006;
     }
     public static final class menu {
         public static final int bookshelf=0x7f050000;
