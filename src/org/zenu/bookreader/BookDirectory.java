@@ -1,5 +1,7 @@
 package org.zenu.bookreader;
 
+import java.io.InputStream;
+
 import android.graphics.drawable.Drawable;
 
 
@@ -22,6 +24,12 @@ public class BookDirectory
 	
 	@Override
 	public Drawable currentPage(int width, int height) throws Exception
+	{
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public InputStream getStream(String page) throws Exception
 	{
 		throw new UnsupportedOperationException();
 	}

@@ -2,15 +2,13 @@ package org.zenu.bookreader;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 
 
@@ -76,7 +74,6 @@ public class BookZipArchive
 		}
 	}
 	
-	@SuppressWarnings("deprecation")
 	@Override
 	public Drawable getCover(int width, int height)
 	{
@@ -84,21 +81,13 @@ public class BookZipArchive
 		{
 			try
 			{
-				ZipFile zip = getArchive();
-				String cover = getArchiveFiles()[0];
-				
-				BitmapFactory.Options opt = new BitmapFactory.Options();
-				opt.inJustDecodeBounds = true;
-				BitmapFactory.decodeStream(zip.getInputStream(zip.getEntry(cover)), null, opt);
-				
-				opt.inJustDecodeBounds = false;
-				opt.inSampleSize = Math.max(1, Math.min(opt.outWidth / width, opt.outHeight / height));
-				opt.inPurgeable = true;
-				Bitmap bmp = BitmapFactory.decodeStream(zip.getInputStream(zip.getEntry(cover)), null, opt);
-				
-				Cover = new BitmapDrawable(bmp);
+				if(CoverPage.length() == 0)
+				{
+					CoverPage = getArchiveFiles()[0];
+				}
+				Cover = ApplicationContext.getContext().getImageCache().getCacheImage(this, CoverPage, width, height);
 			}
-			catch(IOException e)
+			catch(Exception e)
 			{
 				e.printStackTrace();
 			}
@@ -110,7 +99,6 @@ public class BookZipArchive
 		return(Cover);
 	}
 	
-	@SuppressWarnings("deprecation")
 	@Override
 	public Drawable currentPage(int width, int height) throws Exception
 	{
@@ -126,18 +114,14 @@ public class BookZipArchive
 			}
 		}
 		
+		return(ApplicationContext.getContext().getImageCache().getCacheImage(this, Page, width, height));
+	}
+	
+	@Override
+	public InputStream getStream(String page) throws Exception
+	{
 		ZipFile zip = getArchive();
-
-		BitmapFactory.Options opt = new BitmapFactory.Options();
-		opt.inJustDecodeBounds = true;
-		BitmapFactory.decodeStream(zip.getInputStream(zip.getEntry(Page)), null, opt);
-		
-		opt.inJustDecodeBounds = false;
-		opt.inSampleSize = Math.max(1, Math.min(opt.outWidth / width, opt.outHeight / height));
-		opt.inPurgeable = true;
-		Bitmap bmp = BitmapFactory.decodeStream(zip.getInputStream(zip.getEntry(Page)), null, opt);
-		
-		return(new BitmapDrawable(bmp));
+		return(zip.getInputStream(zip.getEntry(page)));
 	}
 
 	@Override

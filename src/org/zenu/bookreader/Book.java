@@ -1,12 +1,7 @@
 package org.zenu.bookreader;
 
-import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Bitmap.CompressFormat;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 
 public abstract class Book
@@ -15,6 +10,7 @@ public abstract class Book
 	public String Path;
 	public Drawable Cover = null;
 	public String Page = "";
+	public String CoverPage = "";
 	private Direction direct_ = Direction.RightToLeft;
 	
 	public Book(String path)
@@ -26,38 +22,6 @@ public abstract class Book
 	public CharSequence getTitle()
 	{
 		return(this.Title);
-	}
-	
-	public byte[] serializeCover(int width, int height)
-	{
-		Drawable d = getCover(width, height);
-		if(d == null || !(d instanceof BitmapDrawable)) {return(null);}
-		
-		Bitmap bmp = ((BitmapDrawable)d).getBitmap();
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		bmp.compress(CompressFormat.PNG, 100, out);
-		return(out.toByteArray());
-	}
-	
-	@SuppressWarnings("deprecation")
-	public void deserializeCover(byte[] data)
-	{
-		if(data == null)
-		{
-			Cover = null;
-			return;
-		}
-		Cover = new BitmapDrawable(BitmapFactory.decodeByteArray(data, 0, data.length));
-	}
-	
-	public void deserializeCover(Context context, byte[] data)
-	{
-		if(data == null)
-		{
-			Cover = null;
-			return;
-		}
-		Cover = new BitmapDrawable(context.getResources(), BitmapFactory.decodeByteArray(data, 0, data.length));
 	}
 	
 	public Direction getDirection()
@@ -72,6 +36,7 @@ public abstract class Book
 	
 	public abstract Drawable getCover(int width, int height);
 	public abstract Drawable currentPage(int width, int height) throws Exception;
+	public abstract InputStream getStream(String page) throws Exception;
 	public abstract void movePage(String page) throws Exception;
 	public abstract boolean moveNextPage() throws Exception;
 	public abstract boolean movePrevPage() throws Exception;
