@@ -6,6 +6,7 @@
     <item
         android:id="@+id/add_shelf"
         android:title="@string/add_shelf"
+        android:showAsAction="ifRoom"
         />
 
 </menu>

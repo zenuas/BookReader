@@ -16,6 +16,7 @@
     <string name="left_to_right">左綴じにする</string>
     <string name="right_to_left">右綴じにする</string>
     
+    <string name="manage_shelf">本棚管理</string>
     <string name="add_shelf">本棚を追加</string>
     <string name="list_bookmark">しおり</string>
     <string name="list_history">履歴</string>

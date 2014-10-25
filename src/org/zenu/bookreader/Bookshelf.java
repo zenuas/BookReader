@@ -71,7 +71,7 @@ public class Bookshelf
 	{
 		switch(item.getItemId())
 		{
-		case R.id.add_shelf:
+		case R.id.manage_shelf:
 			startActivity(new Intent(this, ShelfList.class));
 			break;
 		case R.id.list_bookmark:

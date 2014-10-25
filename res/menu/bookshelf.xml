@@ -4,8 +4,8 @@
     >
     
     <item
-        android:id="@+id/add_shelf"
-        android:title="@string/add_shelf"
+        android:id="@+id/manage_shelf"
+        android:title="@string/manage_shelf"
         android:showAsAction="never"
         />
     <item
