@@ -59,6 +59,7 @@ public final class R {
         public static final int list_history=0x7f030011;
         public static final int manage_shelf=0x7f03000e;
         public static final int nextbook_not_found=0x7f030005;
+        public static final int open_from_bookmark=0x7f030013;
         public static final int open_from_history=0x7f030012;
         public static final int page_seek=0x7f030007;
         public static final int prevbook_not_found=0x7f030006;

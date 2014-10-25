@@ -77,8 +77,11 @@ public class Bookshelf
 		case R.id.manage_shelf:
 			startActivity(new Intent(this, ShelfList.class));
 			break;
+			
 		case R.id.list_bookmark:
+			chooseBookmark();
 			break;
+			
 		case R.id.list_history:
 			chooseHistory();
 			break;
@@ -141,7 +144,17 @@ public class Bookshelf
 		
 		Bookshelf.this.startActivity(intent);
 	}
-
+	
+	public void openBook(String path, int page_index)
+	{
+		Intent intent = new Intent();
+		intent.setClass(Bookshelf.this, BookViewer.class);
+		intent.setData(Uri.parse(path));
+		intent.putExtra(BookViewer.class.getName() + ".page", page_index);
+		
+		Bookshelf.this.startActivity(intent);
+	}
+	
 	private String current_shelf_ = ""; 
 	private String current_shelf_indir_ = ""; 
 	public void setupShelf(String shelf_name, String indir)
@@ -303,6 +316,42 @@ public class Bookshelf
 				public void onClick(DialogInterface dialog, int which)
 				{
 					openBook(files.get(which));
+				}
+			});
+		list.show();
+	}
+	
+	public void chooseBookmark()
+	{
+		Builder list = new Builder(this);
+		list.setTitle(R.string.open_from_bookmark);
+		
+		// setItems $ map (x -> getFileName x.Path) $ getBookmarks
+		final BookCacheDB db = ((ApplicationContext) getApplicationContext()).getDB();
+		final List<Bookmark> bookmarks = db.getBookmarks();
+		list.setItems(Lists.map(bookmarks, new Func1<Bookmark, String>()
+			{
+				@Override
+				public String invoke(Bookmark a1)
+				{
+					try
+					{
+						Book book = db.getBook(a1.Path);
+						return(Path.getFileName(a1.Path) + " [ " + String.valueOf(a1.PageIndex + 1) + " / " + String.valueOf(book.getMaxPage() + " ]"));
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+					}
+					return(Path.getFileName(a1.Path) + " [ " + String.valueOf(a1.PageIndex + 1) + " ]");
+				}
+			}).toArray(new String[0]), new OnClickListener()
+			{
+				@Override
+				public void onClick(DialogInterface dialog, int which)
+				{
+					Bookmark bookmark = bookmarks.get(which);
+					openBook(bookmark.Path, bookmark.PageIndex);
 				}
 			});
 		list.show();

@@ -23,5 +23,6 @@
     <string name="list_history">History</string>
     
     <string name="open_from_history">Open from history</string>
+    <string name="open_from_bookmark">Open from Bookmark</string>
 
 </resources>

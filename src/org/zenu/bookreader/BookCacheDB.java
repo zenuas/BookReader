@@ -1,6 +1,9 @@
 package org.zenu.bookreader;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -19,12 +22,14 @@ class BookCacheDB
 	
 	public void onCreate(SQLiteDatabase db)
 	{
-		db.execSQL("create table BookCache (path text primary key, cover text, page text, pageindex int, maxpage int, direction int, spread int, lastmodified int);");
+		db.execSQL("create table BookCache (path text, pageindex int, page text, maxpage int, cover text, direction int, spread int, lastmodified int, primary key(path));");
+		db.execSQL("create table Bookmarks (path text, pageindex int, page text, createtime int, primary key(path, pageindex));");
 	}
 	
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
 	{
 		db.execSQL("drop table BookCache;");
+		db.execSQL("drop table Bookmarks;");
 		onCreate(db);
 	}
 	
@@ -32,6 +37,7 @@ class BookCacheDB
 	public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion)
 	{
 		db.execSQL("drop table BookCache;");
+		db.execSQL("drop table Bookmarks;");
 		onCreate(db);
 	}
 	
@@ -56,8 +62,8 @@ class BookCacheDB
 				{
 					book.setPageIndex(c.getInt(c.getColumnIndex("pageindex")));
 					book.Page = c.getString(c.getColumnIndex("page"));
-					book.CoverPage = c.getString(c.getColumnIndex("cover"));
 					book.setMaxPage(c.getInt(c.getColumnIndex("maxpage")));
+					book.CoverPage = c.getString(c.getColumnIndex("cover"));
 					book.setDirection(Direction.valueOf(c.getInt(c.getColumnIndex("direction"))));
 					book.setLastModified(d);
 				}
@@ -84,10 +90,88 @@ class BookCacheDB
 		values.put("path", book.Path);
 		values.put("pageindex", book.getPageIndex());
 		values.put("page", book.Page);
-		values.put("cover", book.CoverPage);
 		values.put("maxpage", book.getMaxPage());
+		values.put("cover", book.CoverPage);
 		values.put("direction", book.getDirection().getId());
 		values.put("lastmodified", book.getLastModified());
 		db.insert("BookCache", null, values);
+	}
+	
+	public List<Bookmark> getBookmarks()
+	{
+		SQLiteDatabase db = getReadableDatabase();
+		Cursor c = db.query("Bookmarks", null, null, null, null, null, "createtime desc");
+		
+		List<Bookmark> bookmarks = new ArrayList<Bookmark>();
+		try
+		{
+			if(c.moveToFirst())
+			{
+				do
+				{
+					Bookmark x = new Bookmark();
+					x.Path = c.getString(c.getColumnIndex("path"));
+					x.PageIndex = c.getInt(c.getColumnIndex("pageindex"));
+					x.Page = c.getString(c.getColumnIndex("page"));
+					bookmarks.add(x);
+					
+				} while(c.moveToNext());
+			}
+		}
+		catch(Exception e)
+		{
+			// DBから取得失敗してもなるべくそのまま続行する
+			e.printStackTrace();
+		}
+		return(bookmarks);
+	}
+	
+	public List<Bookmark> getBookmarks(Book book)
+	{
+		SQLiteDatabase db = getReadableDatabase();
+		Cursor c = db.query("Bookmarks", null, "path = ?", new String[] {book.Path}, null, null, "createtime desc");
+		
+		List<Bookmark> bookmarks = new ArrayList<Bookmark>();
+		try
+		{
+			if(c.moveToFirst())
+			{
+				do
+				{
+					Bookmark x = new Bookmark();
+					x.Path = c.getString(c.getColumnIndex("path"));
+					x.PageIndex = c.getInt(c.getColumnIndex("pageindex"));
+					x.Page = c.getString(c.getColumnIndex("page"));
+					bookmarks.add(x);
+					
+				} while(c.moveToNext());
+			}
+		}
+		catch(Exception e)
+		{
+			// DBから取得失敗してもなるべくそのまま続行する
+			e.printStackTrace();
+		}
+		return(bookmarks);
+	}
+	
+	public void addBookmark(Book book)
+	{
+		removeBookmark(book);
+		
+		SQLiteDatabase db = getWritableDatabase();
+		
+		ContentValues values = new ContentValues();
+		values.put("path", book.Path);
+		values.put("pageindex", book.getPageIndex());
+		values.put("page", book.Page);
+		values.put("createtime", new Date().getTime());
+		db.insert("Bookmarks", null, values);
+	}
+	
+	public void removeBookmark(Book book)
+	{
+		SQLiteDatabase db = getWritableDatabase();
+		db.execSQL("delete from Bookmarks where path = ? and pageindex = ?", new Object[] {book.Path, book.getPageIndex()});
 	}
 }

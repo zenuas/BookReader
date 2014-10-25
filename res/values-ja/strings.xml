@@ -23,5 +23,6 @@
     <string name="list_history">履歴</string>
     
     <string name="open_from_history">履歴から開く</string>
+    <string name="open_from_bookmark">しおりから開く</string>
 
 </resources>

@@ -5,7 +5,10 @@ import java.util.List;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.AlertDialog.Builder;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.DialogInterface.OnClickListener;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Rect;
@@ -49,9 +52,10 @@ public class BookViewer
 		}
 		
 		String path = getIntent().getData().getPath();
+		int page_index = getIntent().getIntExtra(BookViewer.class.getName() + ".page", -1);
 		createViewer();
 		
-		if(!setupViewer(path))
+		if(!setupViewer(path, page_index))
 		{
 			Toast.makeText(BookViewer.this, R.string.bookviewer_fileopenerror, Toast.LENGTH_LONG).show();
 			BookViewer.this.finish();
@@ -128,6 +132,27 @@ public class BookViewer
 			ltor.setVisible(true);
 			rtol.setVisible(false);
 		}
+		
+		MenuItem add_bookmark = (MenuItem) menu.findItem(R.id.add_bookmark);
+		MenuItem remove_bookmark = (MenuItem) menu.findItem(R.id.remove_bookmark);
+		if(Lists.filter(((ApplicationContext) getApplicationContext()).getDB().getBookmarks(book_), new Func1<Bookmark, Boolean>()
+			{
+				@Override
+				public Boolean invoke(Bookmark a1)
+				{
+					return(book_.Path.equals(a1.Path) && book_.getPageIndex() == a1.PageIndex);
+				}
+			}).size() > 0)
+		{
+			add_bookmark.setVisible(false);
+			remove_bookmark.setVisible(true);
+		}
+		else
+		{
+			add_bookmark.setVisible(true);
+			remove_bookmark.setVisible(false);
+		}
+		
 		return(super.onPrepareOptionsMenu(menu));
 	}
 	
@@ -147,14 +172,17 @@ public class BookViewer
 			break;
 			
 		case R.id.bookmarks:
+			chooseBookmark(book_);
 			break;
 			
 		case R.id.add_bookmark:
+			((ApplicationContext) getApplicationContext()).getDB().addBookmark(book_);
 			break;
 			
 		case R.id.remove_bookmark:
+			((ApplicationContext) getApplicationContext()).getDB().removeBookmark(book_);
 			break;
-
+			
 		case R.id.left_to_right:
 			book_.setDirection(Direction.LeftToRight);
 			saveBook(book_);
@@ -260,6 +288,11 @@ public class BookViewer
 	
 	public boolean setupViewer(String path)
 	{
+		return(setupViewer(path, -1));
+	}
+	
+	public boolean setupViewer(String path, int page_index)
+	{
 		Book book;
 		try
 		{
@@ -270,6 +303,7 @@ public class BookViewer
 			e.printStackTrace();
 			return(false);
 		}
+		if(page_index >= 0) {book.setPageIndex(page_index);}
 		return(setupViewer(book));
 	}
 	
@@ -542,5 +576,49 @@ public class BookViewer
 	public void saveBook(Book book)
 	{
 		((ApplicationContext) getApplicationContext()).getDB().saveBook(book);
+	}
+	
+	public void chooseBookmark(Book book)
+	{
+		Builder list = new Builder(this);
+		list.setTitle(R.string.open_from_bookmark);
+		
+		// setItems $ map (x -> getFileName x.Path) $ getBookmarks(book)
+		final Book b = book;
+		final BookCacheDB db = ((ApplicationContext) getApplicationContext()).getDB();
+		final List<Bookmark> bookmarks = db.getBookmarks(book);
+		list.setItems(Lists.map(bookmarks, new Func1<Bookmark, String>()
+			{
+				@Override
+				public String invoke(Bookmark a1)
+				{
+					try
+					{
+						Book book = db.getBook(a1.Path);
+						return(Path.getFileName(a1.Path) + " [ " + String.valueOf(a1.PageIndex + 1) + " / " + String.valueOf(book.getMaxPage() + " ]"));
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+					}
+					return(Path.getFileName(a1.Path) + " [ " + String.valueOf(a1.PageIndex + 1) + " ]");
+				}
+			}).toArray(new String[0]), new OnClickListener()
+			{
+				@Override
+				public void onClick(DialogInterface dialog, int which)
+				{
+					b.setPageIndex(bookmarks.get(which).PageIndex);
+					try
+					{
+						updateCanvas(b);
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+					}
+				}
+			});
+		list.show();
 	}
 }
