@@ -15,13 +15,13 @@ public class BookDirectory
 	}
 	
 	@Override
-	public Drawable getCover()
+	public Drawable getCover(int width, int height)
 	{
 		return(ApplicationContext.getContext().getResources().getDrawable(android.R.drawable.ic_menu_gallery));
 	}
 	
 	@Override
-	public Drawable currentPage() throws Exception
+	public Drawable currentPage(int width, int height) throws Exception
 	{
 		throw new UnsupportedOperationException();
 	}

@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 
 
@@ -72,28 +75,44 @@ public class BookZipArchive
 			files_ = null;
 		}
 	}
-
+	
+	@SuppressWarnings("deprecation")
 	@Override
-	public Drawable getCover()
+	public Drawable getCover(int width, int height)
 	{
 		if(this.Cover == null) 
 		{
 			try
 			{
 				ZipFile zip = getArchive();
-				String[] files = getArchiveFiles();
-				return(Drawable.createFromStream(zip.getInputStream(zip.getEntry(files[0])), files[0]));
+				String cover = getArchiveFiles()[0];
+				
+				BitmapFactory.Options opt = new BitmapFactory.Options();
+				opt.inJustDecodeBounds = true;
+				BitmapFactory.decodeStream(zip.getInputStream(zip.getEntry(cover)), null, opt);
+				
+				opt.inJustDecodeBounds = false;
+				opt.inSampleSize = Math.max(1, Math.min(opt.outWidth / width, opt.outHeight / height));
+				opt.inPurgeable = true;
+				Bitmap bmp = BitmapFactory.decodeStream(zip.getInputStream(zip.getEntry(cover)), null, opt);
+				
+				Cover = new BitmapDrawable(bmp);
 			}
 			catch(IOException e)
 			{
 				e.printStackTrace();
 			}
+			finally
+			{
+				close();
+			}
 		}
-		return(this.Cover);
+		return(Cover);
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
-	public Drawable currentPage() throws Exception
+	public Drawable currentPage(int width, int height) throws Exception
 	{
 		if(Page.equals(""))
 		{
@@ -108,7 +127,17 @@ public class BookZipArchive
 		}
 		
 		ZipFile zip = getArchive();
-		return(Drawable.createFromStream(zip.getInputStream(zip.getEntry(Page)), Page));
+
+		BitmapFactory.Options opt = new BitmapFactory.Options();
+		opt.inJustDecodeBounds = true;
+		BitmapFactory.decodeStream(zip.getInputStream(zip.getEntry(Page)), null, opt);
+		
+		opt.inJustDecodeBounds = false;
+		opt.inSampleSize = Math.max(1, Math.min(opt.outWidth / width, opt.outHeight / height));
+		opt.inPurgeable = true;
+		Bitmap bmp = BitmapFactory.decodeStream(zip.getInputStream(zip.getEntry(Page)), null, opt);
+		
+		return(new BitmapDrawable(bmp));
 	}
 
 	@Override

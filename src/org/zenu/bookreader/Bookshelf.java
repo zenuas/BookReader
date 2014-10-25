@@ -60,7 +60,7 @@ public class Bookshelf
 		{
 			String s = shelves.get(i);
 			MenuItem x = menu.add(R.id.shelves, i, 0, s);
-			x.setChecked((i == 0 && current_shelf_.length() == 0) || (current_shelf_.equals(s)));
+			x.setChecked(current_shelf_.equals(s));
 		}
 		menu.setGroupCheckable(R.id.shelves, true, true);
 		return(super.onPrepareOptionsMenu(menu));
@@ -180,21 +180,44 @@ public class Bookshelf
 						}
 						else
 						{
-							item.icon.setImageResource(android.R.drawable.ic_menu_recent_history);
-							new AsyncTask<Book, Integer, Drawable>()
+							if(book.Cover != null)
 							{
-								@Override
-								protected Drawable doInBackground(Book... params)
+								item.icon.setImageDrawable(book.Cover);
+							}
+							else
+							{
+								item.icon.setImageResource(android.R.drawable.ic_menu_recent_history);
+								new AsyncTask<Book, Integer, Drawable>()
 								{
-									return(params[0].getCover());
-								}
-								
-								@Override
-								protected void onPostExecute(Drawable result)
-								{
-									item.icon.setImageDrawable(result);
-								}
-							}.execute(book);
+									@Override
+									protected Drawable doInBackground(Book... params)
+									{
+										try
+										{
+											// item.iconの高さと幅がゼロの場合がある
+											// zero devideが発生してしまうので、とりあえず100くらいにしておく
+											int width = item.icon.getWidth();
+											int height = item.icon.getHeight();
+											return(
+													params[0].getCover(
+														(width  <= 0 ? 100 : width),
+														(height <= 0 ? 100 : height)
+													)
+												);
+										}
+										finally
+										{
+											params[0].close();
+										}
+									}
+									
+									@Override
+									protected void onPostExecute(Drawable result)
+									{
+										item.icon.setImageDrawable(result);
+									}
+								}.execute(book);
+							}
 						}
 						item.text.setText(book.getTitle());
 					}

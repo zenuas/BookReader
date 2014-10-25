@@ -4,17 +4,19 @@ import java.util.List;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.Display;
 import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
-import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -42,12 +44,13 @@ public class BookViewer
 			x.hide();
 		}
 		
-		String path = getIntent().getStringExtra(BookViewer.class.getName() + ".path");
+		final String path = getIntent().getStringExtra(BookViewer.class.getName() + ".path");
 		createViewer();
+		
 		if(!setupViewer(path))
 		{
-			Toast.makeText(this, R.string.bookviewer_fileopenerror, Toast.LENGTH_LONG).show();
-			this.finish();
+			Toast.makeText(BookViewer.this, R.string.bookviewer_fileopenerror, Toast.LENGTH_LONG).show();
+			BookViewer.this.finish();
 		}
 	}
 	
@@ -84,8 +87,7 @@ public class BookViewer
 						toast_.show();
 						
 						book_.setPageIndex(progress);
-						image_.setImageDrawable(book_.currentPage());
-						saveBook();
+						updateCanvas(book_);
 					}
 					catch(Exception e)
 					{
@@ -172,15 +174,6 @@ public class BookViewer
 		image_ = (ImageView) findViewById(R.id.viewer);
 		image_.setScaleType(ScaleType.MATRIX);
 		
-		image_.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener()
-			{
-				@Override
-				public void onGlobalLayout()
-				{
-					setAutoRotateAndFitScaleAndCenter();
-				}
-			});
-		
 		scale_dector_ = new ScaleGestureDetector(this, new ScaleGestureDetector.SimpleOnScaleGestureListener()
 			{
 				@Override
@@ -204,30 +197,33 @@ public class BookViewer
 			{
 				public boolean onSingleTapConfirmed(MotionEvent e)
 				{
-					if(book_.getDirection() == Direction.LeftToRight)
+					if(book_ != null)
 					{
-						// 左綴の場合、ビューの左1/3をタッチでページ戻り、右2/3をタッチでページ送り
-						int center = image_.getWidth() * 1 / 3;
-						if(e.getX() - image_.getLeft() < center)
+						if(book_.getDirection() == Direction.LeftToRight)
 						{
-							movePrevPage();
+							// 左綴の場合、ビューの左1/3をタッチでページ戻り、右2/3をタッチでページ送り
+							int center = image_.getWidth() * 1 / 3;
+							if(e.getX() - image_.getLeft() < center)
+							{
+								movePrevPage();
+							}
+							else
+							{
+								moveNextPage();
+							}
 						}
 						else
 						{
-							moveNextPage();
-						}
-					}
-					else
-					{
-						// 右綴の場合、ビューの左2/3をタッチでページ送り、右1/3をタッチでページ戻り
-						int center = image_.getWidth() * 2 / 3;
-						if(e.getX() - image_.getLeft() < center)
-						{
-							moveNextPage();
-						}
-						else
-						{
-							movePrevPage();
+							// 右綴の場合、ビューの左2/3をタッチでページ送り、右1/3をタッチでページ戻り
+							int center = image_.getWidth() * 2 / 3;
+							if(e.getX() - image_.getLeft() < center)
+							{
+								moveNextPage();
+							}
+							else
+							{
+								movePrevPage();
+							}
 						}
 					}
 					return(super.onSingleTapConfirmed(e));
@@ -236,17 +232,23 @@ public class BookViewer
 				@Override
 				public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY)
 				{
-					Matrix x = new Matrix(image_.getImageMatrix());
-					x.postTranslate(-distanceX, -distanceY);
-					image_.setImageMatrix(x);
-					image_.invalidate();
+					if(book_ != null)
+					{
+						Matrix x = new Matrix(image_.getImageMatrix());
+						x.postTranslate(-distanceX, -distanceY);
+						image_.setImageMatrix(x);
+						image_.invalidate();
+					}
 					return(super.onScroll(e1, e2, distanceX, distanceY));
 				}
 				
 				@Override
 				public boolean onDoubleTap(MotionEvent e)
 				{
-					setActionBarVisibleToggle();
+					if(book_ != null)
+					{
+						setActionBarVisibleToggle();
+					}
 					return(super.onDoubleTap(e));
 				}
 			});
@@ -269,19 +271,17 @@ public class BookViewer
 	
 	public boolean setupViewer(Book book)
 	{
-		Drawable p;
+		if(book_ != null) {book_.close();}
+		book_ = book;
 		try
 		{
-			p = book.currentPage();
+			updateCanvas(book_);
 		}
 		catch(Exception e)
 		{
 			e.printStackTrace();
 			return(false);
 		}
-		image_.setImageDrawable(p);
-		if(book_ != null) {book_.close();}
-		book_ = book;
 		setTitle(book_.getTitle());
 		return(true);
 	}
@@ -301,8 +301,14 @@ public class BookViewer
 	@Override
 	public void onBackPressed()
 	{
-		//super.onBackPressed();
-		moveNextPage();
+		if(book_ != null)
+		{
+			moveNextPage();
+		}
+		else
+		{
+			super.onBackPressed();
+		}
 	}
 	
 	public void setAutoRotateAndFitScaleAndCenter()
@@ -370,8 +376,7 @@ public class BookViewer
 				setupViewer(next);
 				Toast.makeText(this, book_.getTitle(), Toast.LENGTH_SHORT).show();
 			}
-			image_.setImageDrawable(book_.currentPage());
-			saveBook();
+			updateCanvas(book_);
 		}
 		catch(Exception e)
 		{
@@ -398,13 +403,76 @@ public class BookViewer
 				setupViewer(books.get(current - 1));
 				Toast.makeText(this, book_.getTitle(), Toast.LENGTH_SHORT).show();
 			}
-			image_.setImageDrawable(book_.currentPage());
-			saveBook();
+			updateCanvas(book_);
 		}
 		catch(Exception e)
 		{
 			e.printStackTrace();
 		}
+	}
+	
+	public void updateCanvas(Book book) throws Exception
+	{
+		new AsyncTask<Book, Integer, Drawable>()
+			{
+				private int size_;
+				private ProgressDialog wait_;
+				
+				@Override
+				protected void onPreExecute()
+				{
+					size_ = getCanvasSize();
+					
+					wait_ = new ProgressDialog(BookViewer.this);
+					wait_.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+					wait_.show();
+				}
+				
+				@Override
+				protected Drawable doInBackground(Book... params)
+				{
+					try
+					{
+						return(params[0].currentPage(size_, size_));
+					}
+					catch(Exception e)
+					{
+						cancel(false);
+						e.printStackTrace();
+					}
+					return(null);
+				}
+				
+				@Override
+				protected void onCancelled()
+				{
+					wait_.dismiss();
+				}
+				
+				@Override
+				protected void onPostExecute(Drawable result)
+				{
+					image_.setImageDrawable(result);
+					wait_.dismiss();
+					setAutoRotateAndFitScaleAndCenter();
+					saveBook();
+				}
+			}.execute(book);
+	}
+	
+	@SuppressWarnings("deprecation")
+	public int getCanvasSize()
+	{
+		// ビューの高さ・幅の大きいほうの1.5倍をキャンパスサイズとする
+		// 画像ロード後に回転、拡大することを考慮し少し大きめに設定している
+		// 取得失敗時(初期表示中)はディスプレイサイズを代わりに使う
+		int size = Math.max(image_.getWidth(), image_.getHeight());
+		if(size <= 0)
+		{
+			Display display = getWindowManager().getDefaultDisplay();
+			size = Math.max(display.getWidth(), display.getHeight());
+		}
+		return(size * 3 / 2);
 	}
 	
 	public ActionBar setActionBarVisible(boolean visible)

@@ -28,10 +28,9 @@ public abstract class Book
 		return(this.Title);
 	}
 	
-	public byte[] serializeCover()
+	public byte[] serializeCover(int width, int height)
 	{
-		Drawable d = getCover();
-		close();
+		Drawable d = getCover(width, height);
 		if(d == null || !(d instanceof BitmapDrawable)) {return(null);}
 		
 		Bitmap bmp = ((BitmapDrawable)d).getBitmap();
@@ -71,8 +70,8 @@ public abstract class Book
 		direct_ = direct;
 	}
 	
-	public abstract Drawable getCover();
-	public abstract Drawable currentPage() throws Exception;
+	public abstract Drawable getCover(int width, int height);
+	public abstract Drawable currentPage(int width, int height) throws Exception;
 	public abstract void movePage(String page) throws Exception;
 	public abstract boolean moveNextPage() throws Exception;
 	public abstract boolean movePrevPage() throws Exception;
