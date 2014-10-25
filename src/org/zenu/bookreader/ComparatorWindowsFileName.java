@@ -42,7 +42,7 @@ public class ComparatorWindowsFileName<T>
 				
 				left_index++;
 				right_index++;
-				while(true)
+				while(left_index < left.length())
 				{
 					left_char = left.charAt(left_index);
 					
@@ -56,7 +56,7 @@ public class ComparatorWindowsFileName<T>
 						break;
 					}
 				}
-				while(true)
+				while(right_index < right.length())
 				{
 					right_char = right.charAt(right_index);
 					

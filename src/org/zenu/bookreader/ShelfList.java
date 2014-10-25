@@ -31,7 +31,9 @@ public class ShelfList
 				@Override
 				public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id)
 				{
-					return(false);
+					BookShelvesManager.removeShelves(ShelfList.this, (String) parent.getItemAtPosition(position));
+					setupShelves();
+					return(true);
 				}
 			});
 	}
