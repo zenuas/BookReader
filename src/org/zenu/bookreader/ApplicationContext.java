@@ -25,6 +25,7 @@ public class ApplicationContext
 		registerBugReport();
 		
 		db_ = new BookCacheDB(this);
+		imgge_cache_ = new ImageCacheManager(this);
 	}
 	
 	private static ApplicationContext self_ = null;
@@ -37,6 +38,12 @@ public class ApplicationContext
 	public BookCacheDB getDB()
 	{
 		return(db_);
+	}
+	
+	private ImageCacheManager imgge_cache_;
+	public ImageCacheManager getImageCache()
+	{
+		return(imgge_cache_);
 	}
 	
 	public void registerBugReport()

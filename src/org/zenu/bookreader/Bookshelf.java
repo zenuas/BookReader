@@ -7,6 +7,8 @@ import java.util.List;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -113,7 +115,7 @@ public class Bookshelf
 					
 					if(book instanceof BookDirectory)
 					{
-						setupShelf(current_shelf_, book.Path);
+						setupShelf(current_shelf_, Path.combine(current_shelf_indir_, book.Title));
 					}
 					else
 					{
@@ -152,7 +154,7 @@ public class Bookshelf
 						public ImageView icon;
 						public TextView text;
 					}
-					ViewHolder item;
+					final ViewHolder item;
 					
 					if(convertView == null)
 					{
@@ -172,17 +174,29 @@ public class Bookshelf
 					if(position < getCount())
 					{
 						Book book = getItem(position);
-						try
+						if(book instanceof BookDirectory)
 						{
-							boolean loaded = (book.Cover != null);
-							item.icon.setImageDrawable(book.getCover());
-							item.text.setText(book.getTitle());
-							if(!loaded) {((ApplicationContext) getApplicationContext()).getDB().saveBook(book);}
+							item.icon.setImageResource(android.R.drawable.ic_menu_gallery);
 						}
-						finally
+						else
 						{
-							book.close();
+							item.icon.setImageResource(android.R.drawable.ic_menu_recent_history);
+							new AsyncTask<Book, Integer, Drawable>()
+							{
+								@Override
+								protected Drawable doInBackground(Book... params)
+								{
+									return(params[0].getCover());
+								}
+								
+								@Override
+								protected void onPostExecute(Drawable result)
+								{
+									item.icon.setImageDrawable(result);
+								}
+							}.execute(book);
 						}
+						item.text.setText(book.getTitle());
 					}
 					
 					return(convertView);
