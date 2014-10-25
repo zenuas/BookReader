@@ -21,5 +21,7 @@
     <string name="add_shelf">Add shelf</string>
     <string name="list_bookmark">Bookmark</string>
     <string name="list_history">History</string>
+    
+    <string name="open_from_history">Open from history</string>
 
 </resources>

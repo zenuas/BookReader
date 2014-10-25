@@ -16,6 +16,7 @@ public class BookZipArchive
 	extends Book
 {
 	public static final String[] AcceptExtension = {".zip"};
+	public static final String MimeType = "application/zip";
 	
 	public BookZipArchive(String path)
 	{
@@ -147,6 +148,7 @@ public class BookZipArchive
 				//　該当のPageの次のページへ移動しtrueを返す
 				//　Pageの該当が無ければ最初のページへ移動しtrueを返す
 				Page = files[current + 1];
+				page_index_ = current + 1;
 				return(true);
 			}
 		}
@@ -172,6 +174,7 @@ public class BookZipArchive
 			{
 				// Pageの前のページに移動しtrueを返す
 				Page = files[current - 1];
+				page_index_ = current - 1;
 				return(true);
 			}
 		}
@@ -187,6 +190,7 @@ public class BookZipArchive
 	{
 		String[] files = getArchiveFiles();
 		Page = files[0];
+		page_index_ = 0;
 	}
 	
 	@Override
@@ -194,8 +198,9 @@ public class BookZipArchive
 	{
 		String[] files = getArchiveFiles();
 		Page = files[files.length - 1];
+		page_index_ = files.length - 1;
 	}
-
+	
 	private int page_index_ = -1;
 	private int max_page_ = -1;
 	private long last_modified_ = 0;

@@ -48,7 +48,7 @@ public class BookViewer
 			x.hide();
 		}
 		
-		final String path = getIntent().getStringExtra(BookViewer.class.getName() + ".path");
+		String path = getIntent().getData().getPath();
 		createViewer();
 		
 		if(!setupViewer(path))
@@ -157,13 +157,13 @@ public class BookViewer
 
 		case R.id.left_to_right:
 			book_.setDirection(Direction.LeftToRight);
-			saveBook();
+			saveBook(book_);
 			setActionBarVisible(true);
 			break;
 			
 		case R.id.right_to_left:
 			book_.setDirection(Direction.RightToLeft);
-			saveBook();
+			saveBook(book_);
 			setActionBarVisible(true);
 			break;
 		}
@@ -287,6 +287,7 @@ public class BookViewer
 			return(false);
 		}
 		setTitle(book_.getTitle());
+		HistoryManager.addHistory(this, book.Path);
 		return(true);
 	}
 	
@@ -414,7 +415,7 @@ public class BookViewer
 			e.printStackTrace();
 		}
 	}
-
+	
 	private Dialog wait_ = null;
 	private Handler handler_ = null;
 	private Runnable wait_delay_ = null;
@@ -440,6 +441,7 @@ public class BookViewer
 				};
 		}
 		
+		final Book b = book;
 		new AsyncTask<Book, Integer, Drawable>()
 			{
 				private int size_;
@@ -456,7 +458,6 @@ public class BookViewer
 				{
 					try
 					{
-						Thread.sleep(5000);
 						return(params[0].currentPage(size_, size_));
 					}
 					catch(Exception e)
@@ -480,9 +481,9 @@ public class BookViewer
 					handler_.removeCallbacks(wait_delay_);
 					wait_.dismiss();
 					setAutoRotateAndFitScaleAndCenter();
-					saveBook();
+					saveBook(b);
 				}
-			}.execute(book);
+			}.execute(b);
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -517,7 +518,7 @@ public class BookViewer
 				{
 					seek.setRotation(180);
 				}
-				seek.setMax(book_.getMaxPage());
+				seek.setMax(book_.getMaxPage() - 1);
 				seek.setProgress(book_.getPageIndex());
 			}
 			else
@@ -538,8 +539,8 @@ public class BookViewer
 		return(x);
 	}
 	
-	public void saveBook()
+	public void saveBook(Book book)
 	{
-		((ApplicationContext) getApplicationContext()).getDB().saveBook(book_);
+		((ApplicationContext) getApplicationContext()).getDB().saveBook(book);
 	}
 }

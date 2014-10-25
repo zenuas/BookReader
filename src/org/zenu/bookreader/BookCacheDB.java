@@ -54,9 +54,9 @@ class BookCacheDB
 				long d = c.getLong(c.getColumnIndex("lastmodified"));
 				if(d == book.getLastModified())
 				{
+					book.setPageIndex(c.getInt(c.getColumnIndex("pageindex")));
 					book.Page = c.getString(c.getColumnIndex("page"));
 					book.CoverPage = c.getString(c.getColumnIndex("cover"));
-					//book.setPageIndex(c.getInt(c.getColumnIndex("pageindex")));
 					book.setMaxPage(c.getInt(c.getColumnIndex("maxpage")));
 					book.setDirection(Direction.valueOf(c.getInt(c.getColumnIndex("direction"))));
 					book.setLastModified(d);
@@ -82,9 +82,9 @@ class BookCacheDB
 		
 		ContentValues values = new ContentValues();
 		values.put("path", book.Path);
+		values.put("pageindex", book.getPageIndex());
 		values.put("page", book.Page);
 		values.put("cover", book.CoverPage);
-		values.put("pageindex", book.getPageIndex());
 		values.put("maxpage", book.getMaxPage());
 		values.put("direction", book.getDirection().getId());
 		values.put("lastmodified", book.getLastModified());

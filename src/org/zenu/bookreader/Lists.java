@@ -6,6 +6,45 @@ import java.util.List;
 
 public class Lists
 {
+	public static <T> List<T> top(T[] xs, int n)
+	{
+		List<T> xxs = new ArrayList<T>();
+		for(int i = 0; i < xs.length && i < n; i++)
+		{
+			xxs.add(xs[i]);
+		}
+		return(xxs);
+	}
+	
+	public static <T> List<T> top(List<T> xs, int n)
+	{
+		List<T> xxs = new ArrayList<T>();
+		for(int i = 0; i < xs.size() && i < n; i++)
+		{
+			xxs.add(xs.get(i));
+		}
+		return(xxs);
+	}
+	public static <T> List<T> tail(T[] xs, int n)
+	{
+		List<T> xxs = new ArrayList<T>();
+		for(int i = Math.max(0, xs.length - n); i < xs.length; i++)
+		{
+			xxs.add(xs[i]);
+		}
+		return(xxs);
+	}
+	
+	public static <T> List<T> tail(List<T> xs, int n)
+	{
+		List<T> xxs = new ArrayList<T>();
+		for(int i = Math.max(0, xs.size() - n); i < xs.size(); i++)
+		{
+			xxs.add(xs.get(i));
+		}
+		return(xxs);
+	}
+	
 	public static <T> List<T> filter(T[] xs, Func1<T, Boolean> f)
 	{
 		List<T> xxs = new ArrayList<T>();

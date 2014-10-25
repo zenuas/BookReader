@@ -21,5 +21,7 @@
     <string name="add_shelf">本棚を追加</string>
     <string name="list_bookmark">しおり</string>
     <string name="list_history">履歴</string>
+    
+    <string name="open_from_history">履歴から開く</string>
 
 </resources>

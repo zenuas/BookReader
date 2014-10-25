@@ -6,8 +6,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.AlertDialog.Builder;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -76,6 +80,7 @@ public class Bookshelf
 		case R.id.list_bookmark:
 			break;
 		case R.id.list_history:
+			chooseHistory();
 			break;
 			
 		case R.id.send_bugreport:
@@ -122,14 +127,19 @@ public class Bookshelf
 					}
 					else
 					{
-						Intent intent = new Intent();
-						intent.setClass(Bookshelf.this, BookViewer.class);
-						intent.putExtra(BookViewer.class.getName() + ".path", book.Path);
-						
-						Bookshelf.this.startActivity(intent);
+						openBook(book.Path);
 					}
 				}
 			});
+	}
+	
+	public void openBook(String path)
+	{
+		Intent intent = new Intent();
+		intent.setClass(Bookshelf.this, BookViewer.class);
+		intent.setData(Uri.parse(path));
+		
+		Bookshelf.this.startActivity(intent);
 	}
 
 	private String current_shelf_ = ""; 
@@ -261,5 +271,40 @@ public class Bookshelf
 		}
 		
 		return(xs);
+	}
+	
+	public void chooseHistory()
+	{
+		Builder list = new Builder(this);
+		list.setTitle(R.string.open_from_history);
+		
+		// setItems $ map (x -> getFileName x) $ getHistory
+		final BookCacheDB db = ((ApplicationContext) getApplicationContext()).getDB();
+		final List<String> files = HistoryManager.getHistory(this);
+		list.setItems(Lists.map(files, new Func1<String, String>()
+			{
+				@Override
+				public String invoke(String a1)
+				{
+					try
+					{
+						Book book = db.getBook(a1);
+						return(Path.getFileName(a1) + " [ " + String.valueOf(book.getPageIndex() + 1) + " / " + String.valueOf(book.getMaxPage() + " ]"));
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+					}
+					return(Path.getFileName(a1));
+				}
+			}).toArray(new String[0]), new OnClickListener()
+			{
+				@Override
+				public void onClick(DialogInterface dialog, int which)
+				{
+					openBook(files.get(which));
+				}
+			});
+		list.show();
 	}
 }
