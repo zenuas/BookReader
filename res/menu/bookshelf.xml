@@ -18,6 +18,11 @@
         android:title="@string/list_history"
         android:showAsAction="never"
         />
+    <item
+        android:id="@+id/send_bugreport"
+        android:title="@string/send_bugreport"
+        android:showAsAction="never"
+        />
     
     <group
         android:id="@+id/shelves"

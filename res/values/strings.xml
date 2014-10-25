@@ -2,6 +2,7 @@
 
     <string name="app_name">BookReader</string>
     <string name="icon"></string>
+    <string name="send_bugreport">Send to BugReport(Mail)</string>
     
     <string name="directoy_access_denied">Directory access denied</string>
     

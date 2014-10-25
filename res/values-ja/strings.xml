@@ -2,6 +2,7 @@
 
     <string name="app_name">BookReader</string>
     <string name="icon"></string>
+    <string name="send_bugreport">メールでBugReportを送信</string>
     
     <string name="directoy_access_denied">Directory access denied</string>
     

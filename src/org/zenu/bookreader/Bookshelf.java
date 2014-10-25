@@ -31,9 +31,6 @@ public class Bookshelf
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.bookshelf);
 		
-		ApplicationContext app = (ApplicationContext) getApplicationContext();
-		app.sendBugReport();
-
 		createShelf();
 		List<String> shelves = BookShelvesManager.getShelves(this);
 		if(shelves.size() > 0)
@@ -53,6 +50,8 @@ public class Bookshelf
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu)
 	{
+		menu.findItem(R.id.send_bugreport).setEnabled(((ApplicationContext) getApplicationContext()).existsBugReport());
+		
 		menu.removeGroup(R.id.shelves);
 		
 		List<String> shelves = BookShelvesManager.getShelves(this);
@@ -77,6 +76,10 @@ public class Bookshelf
 		case R.id.list_bookmark:
 			break;
 		case R.id.list_history:
+			break;
+			
+		case R.id.send_bugreport:
+			((ApplicationContext) getApplicationContext()).sendBugReport();
 			break;
 			
 		default:

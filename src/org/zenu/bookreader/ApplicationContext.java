@@ -56,6 +56,7 @@ public class ApplicationContext
 				@Override
 				public void uncaughtException(Thread thread, Throwable ex)
 				{
+					String report = pref.getString("BugReport", "");
 					ByteArrayOutputStream out = new ByteArrayOutputStream();
 					Editor edit = pref.edit();
 					String pkg = getPackageName();
@@ -63,6 +64,12 @@ public class ApplicationContext
 					PrintWriter p = new PrintWriter(out);
 					try
 					{
+						if(report.length() > 0)
+						{
+							p.println(report);
+							p.println();
+						}
+						
 						p.println("PackageInfo.PackageName : " + pkg);
 						try
 						{
@@ -91,6 +98,13 @@ public class ApplicationContext
 					defaultUncaughtExceptionHandler.uncaughtException(thread, ex);
 				}
 			});
+	}
+	
+	public boolean existsBugReport()
+	{
+		final SharedPreferences pref = getSharedPreferences(getClass().getName(), MODE_PRIVATE);
+		String report = pref.getString("BugReport", "");
+		return(report.length() > 0);
 	}
 	
 	public boolean sendBugReport()
