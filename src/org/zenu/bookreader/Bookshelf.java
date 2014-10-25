@@ -90,7 +90,7 @@ public class Bookshelf
 	{
 		String parent = Path.getDirectoryName(current_shelf_indir_);
 		parent = (parent.length() > 0 && parent.charAt(parent.length() - 1) == File.separatorChar ? parent.substring(0, parent.length() - 1) : parent);
-		if(parent.startsWith(current_shelf_))
+		if(parent.length() > 0 && parent.startsWith(current_shelf_))
 		{
 			setupShelf(current_shelf_, parent);
 		}
