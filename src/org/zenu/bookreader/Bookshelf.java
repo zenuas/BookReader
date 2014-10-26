@@ -220,16 +220,7 @@ public class Bookshelf
 									{
 										try
 										{
-											// item.iconの高さと幅がゼロの場合がある
-											// zero devideが発生してしまうので、とりあえず100くらいにしておく
-											int width = item.icon.getWidth();
-											int height = item.icon.getHeight();
-											return(
-													params[0].getCover(
-														(width  <= 0 ? 100 : width),
-														(height <= 0 ? 100 : height)
-													)
-												);
+											return(params[0].getCover(item.icon.getWidth(), item.icon.getHeight()));
 										}
 										finally
 										{
@@ -274,7 +265,8 @@ public class Bookshelf
 				}
 				else
 				{
-					xs.add(context.getDB().getBook(f));
+					Book book = context.getDB().getBook(f);
+					if(book != null) {xs.add(book);}
 				}
 			}
 			catch(Exception e)

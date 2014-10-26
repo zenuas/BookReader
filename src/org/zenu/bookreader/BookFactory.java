@@ -12,7 +12,7 @@ public class BookFactory
 		
 		if(contains(BookZipArchive.AcceptExtension, ext)) {return(new BookZipArchive(path));}
 		
-		throw new Exception();
+		return(null);
 	}
 	
 	public static boolean contains(String[] xs, String s)

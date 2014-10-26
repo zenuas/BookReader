@@ -17,7 +17,6 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.Display;
 import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -298,6 +297,7 @@ public class BookViewer
 		try
 		{
 			book = ((ApplicationContext) getApplicationContext()).getDB().getBook(path);
+			if(book == null) {return(false);}
 		}
 		catch(Exception e)
 		{
@@ -526,19 +526,11 @@ public class BookViewer
 			}.execute(b);
 	}
 	
-	@SuppressWarnings("deprecation")
 	public int getCanvasSize()
 	{
 		// ビューの高さ・幅の大きいほうの1.5倍をキャンパスサイズとする
 		// 画像ロード後に回転、拡大することを考慮し少し大きめに設定している
-		// 取得失敗時(初期表示中)はディスプレイサイズを代わりに使う
-		int size = Math.max(image_.getWidth(), image_.getHeight());
-		if(size <= 0)
-		{
-			Display display = getWindowManager().getDefaultDisplay();
-			size = Math.max(display.getWidth(), display.getHeight());
-		}
-		return(size * 3 / 2);
+		return(Math.max(image_.getWidth(), image_.getHeight()) * 3 / 2);
 	}
 	
 	public ActionBar setActionBarVisible(boolean visible)

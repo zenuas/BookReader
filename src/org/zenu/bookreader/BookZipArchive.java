@@ -87,7 +87,7 @@ public class BookZipArchive
 				{
 					CoverPage = getArchiveFiles()[0];
 				}
-				Cover = ApplicationContext.getContext().getImageCache().getCacheImage(this, CoverPage, width, height);
+				Cover = ApplicationContext.getContext().getImageCache().getCacheImage(this, CoverPage, width, height, 0);
 			}
 			catch(Exception e)
 			{
@@ -117,7 +117,7 @@ public class BookZipArchive
 			}
 		}
 		
-		return(ApplicationContext.getContext().getImageCache().getCacheImage(this, Page, width, height));
+		return(ApplicationContext.getContext().getImageCache().getCacheImage(this, Page, width, height, 5 * 60 * 60));
 	}
 	
 	@Override

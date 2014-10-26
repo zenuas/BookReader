@@ -53,6 +53,7 @@ class BookCacheDB
 		Cursor c = db.query("BookCache", null, "path = ?", new String[] {path}, null, null, null);
 		
 		Book book = BookFactory.open(path);
+		if(book == null) {return(null);}
 		try
 		{
 			if(c.moveToFirst())
