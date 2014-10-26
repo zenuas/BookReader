@@ -364,13 +364,16 @@ public class BookViewer
 		
 		Matrix x = new Matrix();
 		
-		// ビューが縦表示で、画像の横幅が縦幅の1.5倍を超えていたら90度回転
+		// ビューが縦表示で、画像の横幅が縦幅を超えていたら90度回転
 		float scale = 1.0f;
 		x.postTranslate(-image_width / 2, -image_height / 2);
-		if(view_height > view_width && image_width > image_height * 1.5)
+		if(view_height > view_width && image_width > image_height)
 		{
 			x.postRotate(90);
-			scale = view_height / image_width;
+			float height_scale = view_width / image_height;
+			float width_scale = view_height / image_width;
+			
+			scale = Math.min(height_scale, width_scale);
 		}
 		else
 		{
