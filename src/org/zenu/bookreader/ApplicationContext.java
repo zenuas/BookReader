@@ -46,55 +46,60 @@ public class ApplicationContext
 		return(imgge_cache_);
 	}
 	
+	public void addBugReport(Throwable ex)
+	{
+		SharedPreferences pref = getSharedPreferences(getClass().getName(), MODE_PRIVATE);
+		
+		String report = pref.getString("BugReport", "");
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		Editor edit = pref.edit();
+		String pkg = getPackageName();
+		
+		PrintWriter p = new PrintWriter(out);
+		try
+		{
+			if(report.length() > 0)
+			{
+				p.println(report);
+				p.println();
+			}
+			
+			p.println("PackageInfo.PackageName : " + pkg);
+			try
+			{
+				PackageInfo info = getPackageManager().getPackageInfo(pkg, 0);
+				p.println("PackageInfo.VersionName : " + info.versionName);
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+				//ApplicationContext.getContext().addBugReport(e);
+			}
+			p.println("Date : " + (new Date()).toString());
+			p.println("Build.DEVICE : " + Build.DEVICE);
+			p.println("Build.MODEL : " + Build.MODEL);
+			p.println("Build.VERSION.SDK_INT : " + Build.VERSION.SDK_INT);
+			ex.printStackTrace(p);
+			p.println();
+		}
+		finally
+		{
+			p.close();
+		}
+		
+		edit.putString("BugReport", out.toString());
+		edit.commit();
+	}
+	
 	public void registerBugReport()
 	{
-		final SharedPreferences pref = getSharedPreferences(getClass().getName(), MODE_PRIVATE);
-		
 		final UncaughtExceptionHandler defaultUncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler();
 		Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler()
 			{
 				@Override
 				public void uncaughtException(Thread thread, Throwable ex)
 				{
-					String report = pref.getString("BugReport", "");
-					ByteArrayOutputStream out = new ByteArrayOutputStream();
-					Editor edit = pref.edit();
-					String pkg = getPackageName();
-					
-					PrintWriter p = new PrintWriter(out);
-					try
-					{
-						if(report.length() > 0)
-						{
-							p.println(report);
-							p.println();
-						}
-						
-						p.println("PackageInfo.PackageName : " + pkg);
-						try
-						{
-							PackageInfo info = getPackageManager().getPackageInfo(pkg, 0);
-							p.println("PackageInfo.VersionName : " + info.versionName);
-						}
-						catch(Exception e)
-						{
-							e.printStackTrace();
-						}
-						p.println("Date : " + (new Date()).toString());
-						p.println("Build.DEVICE : " + Build.DEVICE);
-						p.println("Build.MODEL : " + Build.MODEL);
-						p.println("Build.VERSION.SDK_INT : " + Build.VERSION.SDK_INT);
-						ex.printStackTrace(p);
-						p.println();
-					}
-					finally
-					{
-						p.close();
-					}
-					
-					edit.putString("BugReport", out.toString());
-					edit.commit();
-					
+					addBugReport(ex);
 					defaultUncaughtExceptionHandler.uncaughtException(thread, ex);
 				}
 			});

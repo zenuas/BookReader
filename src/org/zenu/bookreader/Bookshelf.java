@@ -280,6 +280,7 @@ public class Bookshelf
 			catch(Exception e)
 			{
 				e.printStackTrace();
+				ApplicationContext.getContext().addBugReport(e);
 			}
 		}
 		
@@ -307,6 +308,7 @@ public class Bookshelf
 					catch(Exception e)
 					{
 						e.printStackTrace();
+						ApplicationContext.getContext().addBugReport(e);
 					}
 					return(Path.getFileName(a1));
 				}
@@ -342,6 +344,7 @@ public class Bookshelf
 					catch(Exception e)
 					{
 						e.printStackTrace();
+						ApplicationContext.getContext().addBugReport(e);
 					}
 					return(Path.getFileName(a1.Path) + " [ " + String.valueOf(a1.PageIndex + 1) + " ]");
 				}

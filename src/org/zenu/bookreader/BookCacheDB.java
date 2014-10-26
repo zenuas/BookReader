@@ -77,6 +77,7 @@ class BookCacheDB
 		{
 			// DBから取得失敗してもなるべくそのまま続行する
 			e.printStackTrace();
+			ApplicationContext.getContext().addBugReport(e);
 		}
 		return(book);
 	}
@@ -122,6 +123,7 @@ class BookCacheDB
 		{
 			// DBから取得失敗してもなるべくそのまま続行する
 			e.printStackTrace();
+			ApplicationContext.getContext().addBugReport(e);
 		}
 		return(bookmarks);
 	}
@@ -151,6 +153,7 @@ class BookCacheDB
 		{
 			// DBから取得失敗してもなるべくそのまま続行する
 			e.printStackTrace();
+			ApplicationContext.getContext().addBugReport(e);
 		}
 		return(bookmarks);
 	}

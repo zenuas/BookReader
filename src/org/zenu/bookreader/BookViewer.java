@@ -100,6 +100,7 @@ public class BookViewer
 					catch(Exception e)
 					{
 						e.printStackTrace();
+						ApplicationContext.getContext().addBugReport(e);
 					}
 				}
 				
@@ -301,6 +302,7 @@ public class BookViewer
 		catch(Exception e)
 		{
 			e.printStackTrace();
+			ApplicationContext.getContext().addBugReport(e);
 			return(false);
 		}
 		if(page_index >= 0) {book.setPageIndex(page_index);}
@@ -318,6 +320,7 @@ public class BookViewer
 		catch(Exception e)
 		{
 			e.printStackTrace();
+			ApplicationContext.getContext().addBugReport(e);
 			return(false);
 		}
 		setTitle(book_.getTitle());
@@ -420,6 +423,7 @@ public class BookViewer
 		catch(Exception e)
 		{
 			e.printStackTrace();
+			ApplicationContext.getContext().addBugReport(e);
 		}
 	}
 	
@@ -447,6 +451,7 @@ public class BookViewer
 		catch(Exception e)
 		{
 			e.printStackTrace();
+			ApplicationContext.getContext().addBugReport(e);
 		}
 	}
 	
@@ -498,6 +503,7 @@ public class BookViewer
 					{
 						cancel(false);
 						e.printStackTrace();
+						ApplicationContext.getContext().addBugReport(e);
 					}
 					return(null);
 				}
@@ -600,6 +606,7 @@ public class BookViewer
 					catch(Exception e)
 					{
 						e.printStackTrace();
+						ApplicationContext.getContext().addBugReport(e);
 					}
 					return(Path.getFileName(a1.Path) + " [ " + String.valueOf(a1.PageIndex + 1) + " ]");
 				}
@@ -616,6 +623,7 @@ public class BookViewer
 					catch(Exception e)
 					{
 						e.printStackTrace();
+						ApplicationContext.getContext().addBugReport(e);
 					}
 				}
 			});

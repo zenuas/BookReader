@@ -69,6 +69,7 @@ public class BookZipArchive
 			catch(IOException e)
 			{
 				e.printStackTrace();
+				ApplicationContext.getContext().addBugReport(e);
 			}
 			zip_ = null;
 			files_ = null;
@@ -91,6 +92,7 @@ public class BookZipArchive
 			catch(Exception e)
 			{
 				e.printStackTrace();
+				ApplicationContext.getContext().addBugReport(e);
 			}
 			finally
 			{
@@ -224,6 +226,7 @@ public class BookZipArchive
 		catch(IOException e)
 		{
 			e.printStackTrace();
+			ApplicationContext.getContext().addBugReport(e);
 		}
 		return(-1);
 	}
@@ -240,6 +243,7 @@ public class BookZipArchive
 		catch(Exception e)
 		{
 			e.printStackTrace();
+			ApplicationContext.getContext().addBugReport(e);
 		}
 	}
 	
@@ -255,6 +259,7 @@ public class BookZipArchive
 		catch(IOException e)
 		{
 			e.printStackTrace();
+			ApplicationContext.getContext().addBugReport(e);
 		}
 		return(-1);
 	}
