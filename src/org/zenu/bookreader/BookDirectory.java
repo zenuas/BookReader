@@ -29,6 +29,18 @@ public class BookDirectory
 	}
 	
 	@Override
+	public void loadLookAHead(int page, int width, int height) throws Exception
+	{
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public void loadLookAHead(String page, int width, int height) throws Exception
+	{
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
 	public InputStream getStream(String page) throws Exception
 	{
 		throw new UnsupportedOperationException();

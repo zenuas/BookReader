@@ -36,6 +36,8 @@ public abstract class Book
 	
 	public abstract Drawable getCover(int width, int height);
 	public abstract Drawable currentPage(int width, int height) throws Exception;
+	public abstract void loadLookAHead(int page, int width, int height) throws Exception;
+	public abstract void loadLookAHead(String page, int width, int height) throws Exception;
 	public abstract InputStream getStream(String page) throws Exception;
 	public abstract void movePage(String page) throws Exception;
 	public abstract boolean moveNextPage() throws Exception;

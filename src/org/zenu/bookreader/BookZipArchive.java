@@ -117,7 +117,19 @@ public class BookZipArchive
 			}
 		}
 		
-		return(ApplicationContext.getContext().getImageCache().getCacheImage(this, Page, width, height, 5 * 60 * 60));
+		return(ApplicationContext.getContext().getImageCache().getCacheImage(this, Page, width, height, 5 * 60 * 1000));
+	}
+	
+	@Override
+	public void loadLookAHead(int page, int width, int height) throws Exception
+	{
+		loadLookAHead(getArchiveFiles()[page], width, height);
+	}
+	
+	@Override
+	public void loadLookAHead(String page, int width, int height) throws Exception
+	{
+		ApplicationContext.getContext().getImageCache().makeCache(this, Page, width, height, 5 * 60 * 1000);
 	}
 	
 	@Override

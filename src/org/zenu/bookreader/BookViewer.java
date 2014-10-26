@@ -422,6 +422,29 @@ public class BookViewer
 				Toast.makeText(this, book_.getTitle(), Toast.LENGTH_SHORT).show();
 			}
 			updateCanvas(book_);
+			
+			// 次のページがあれば先読み
+			final int lookahead = book_.getPageIndex() + 1;
+			if(lookahead >= book_.getMaxPage())
+			{
+				new Thread(new Runnable()
+					{
+						@Override
+						public void run()
+						{
+							int size = getCanvasSize();
+							try
+							{
+								book_.loadLookAHead(lookahead, size, size);
+							}
+							catch(Exception e)
+							{
+								e.printStackTrace();
+								ApplicationContext.getContext().addBugReport(e);
+							}
+						}
+					}).run();
+			}
 		}
 		catch(Exception e)
 		{
@@ -461,7 +484,7 @@ public class BookViewer
 	private Dialog wait_ = null;
 	private Handler handler_ = null;
 	private Runnable wait_delay_ = null;
-	public void updateCanvas(Book book) throws Exception
+	public void updateCanvas(final Book book) throws Exception
 	{
 		if(wait_ == null)
 		{
@@ -483,7 +506,6 @@ public class BookViewer
 				};
 		}
 		
-		final Book b = book;
 		new AsyncTask<Book, Integer, Drawable>()
 			{
 				private int size_;
@@ -524,9 +546,9 @@ public class BookViewer
 					handler_.removeCallbacks(wait_delay_);
 					wait_.dismiss();
 					setAutoRotateAndFitScaleAndCenter();
-					saveBook(b);
+					saveBook(book);
 				}
-			}.execute(b);
+			}.execute(book);
 	}
 	
 	public int getCanvasSize()
@@ -579,13 +601,12 @@ public class BookViewer
 		((ApplicationContext) getApplicationContext()).getDB().saveBook(book);
 	}
 	
-	public void chooseBookmark(Book book)
+	public void chooseBookmark(final Book book)
 	{
 		Builder list = new Builder(this);
 		list.setTitle(R.string.open_from_bookmark);
 		
 		// setItems $ map (x -> getFileName x.Path) $ getBookmarks(book)
-		final Book b = book;
 		final BookCacheDB db = ((ApplicationContext) getApplicationContext()).getDB();
 		final List<Bookmark> bookmarks = db.getBookmarks(book);
 		list.setItems(Lists.map(bookmarks, new Func1<Bookmark, String>()
@@ -610,10 +631,10 @@ public class BookViewer
 				@Override
 				public void onClick(DialogInterface dialog, int which)
 				{
-					b.setPageIndex(bookmarks.get(which).PageIndex);
+					book.setPageIndex(bookmarks.get(which).PageIndex);
 					try
 					{
-						updateCanvas(b);
+						updateCanvas(book);
 					}
 					catch(Exception e)
 					{

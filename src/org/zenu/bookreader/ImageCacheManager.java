@@ -36,7 +36,7 @@ public class ImageCacheManager
 					{
 						try
 						{
-							Thread.sleep(5 * 60 * 60);
+							Thread.sleep(5 * 60 * 1000);
 							clearCache(new Date().getTime());
 						}
 						catch(InterruptedException e)
@@ -47,6 +47,25 @@ public class ImageCacheManager
 					}
 				}
 			}).start();
+	}
+	
+	public Bitmap getBitmap(Book book, String page, int width, int height) throws Exception
+	{
+		BitmapFactory.Options opt = new BitmapFactory.Options();
+		opt.inJustDecodeBounds = true;
+		BitmapFactory.decodeStream(book.getStream(page), null, opt);
+		
+		opt.inJustDecodeBounds = false;
+		if(width > 0 && height > 0)
+		{
+			opt.inSampleSize = Math.max(1, Math.min(opt.outWidth / width, opt.outHeight / height));
+		}
+		else
+		{
+			opt.inSampleSize = Math.max(1, Math.min(opt.outWidth / 1000, opt.outHeight / 1000));
+		}
+		opt.inPurgeable = true;
+		return(BitmapFactory.decodeStream(book.getStream(page), null, opt));
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -69,62 +88,76 @@ public class ImageCacheManager
 			}
 		}
 		
-		BitmapFactory.Options opt = new BitmapFactory.Options();
-		opt.inJustDecodeBounds = true;
-		BitmapFactory.decodeStream(book.getStream(page), null, opt);
-		
-		opt.inJustDecodeBounds = false;
-		if(width > 0 && height > 0)
-		{
-			opt.inSampleSize = Math.max(1, Math.min(opt.outWidth / width, opt.outHeight / height));
-		}
-		else
-		{
-			opt.inSampleSize = Math.max(1, Math.min(opt.outWidth / 1000, opt.outHeight / 1000));
-		}
-		opt.inPurgeable = true;
-		final Bitmap bmp = BitmapFactory.decodeStream(book.getStream(page), null, opt);
-		
+		Bitmap bmp = getBitmap(book, page, width, height);
 		if(width > 0 && height > 0 && bmp != null)
 		{
-			new Thread(new Runnable()
-				{
-					@Override
-					public void run()
-					{
-						// .tempにファイル出力し、最後に目的のファイルにリネームする
-						synchronized(temp_create_)
-						{
-							try
-							{
-								File temp = new File(Path.combine(CacheDir, ".temp"));
-								cache.getParentFile().mkdirs();
-								FileOutputStream out = new FileOutputStream(temp);
-								try
-								{
-									bmp.compress(Bitmap.CompressFormat.PNG, 100, out);
-								}
-								finally
-								{
-									out.close();
-								}
-								synchronized(cache_access_)
-								{
-									cache.delete();
-									temp.renameTo(cache);
-								}
-							}
-							catch(IOException e)
-							{
-								e.printStackTrace();
-								ApplicationContext.getContext().addBugReport(e);
-							}
-						}
-					}
-				}).start();
+			makeCache(cache, bmp);
 		}
 		
 		return(new BitmapDrawable(bmp));
+	}
+	
+	public void makeCache(Book book, String page, int width, int height, long expire) throws Exception
+	{
+		if(width <= 0 || height <= 0) {return;}
+		
+		// cache = CacheDir/getHashcode(Path, page)_width_height_expire
+		String file = getHashcode(Path.combine(book.Path, page)) + "_" + String.valueOf(width) + "_" + String.valueOf(height) + "_" + String.valueOf(expire);
+		File cache = new File(Path.combine(CacheDir, file));
+		
+		synchronized(cache_access_)
+		{
+			if(cache.isFile() && book.getLastModified() <= cache.lastModified())
+			{
+				cache.setLastModified(new Date().getTime());
+				return;
+			}
+		}
+		
+		Bitmap bmp = getBitmap(book, page, width, height);
+		if(width > 0 && height > 0 && bmp != null)
+		{
+			makeCache(cache, bmp);
+		}
+	}
+	
+	public void makeCache(final File cache, final Bitmap bmp)
+	{
+		new Thread(new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					// .tempにファイル出力し、最後に目的のファイルにリネームする
+					synchronized(temp_create_)
+					{
+						try
+						{
+							File temp = new File(Path.combine(CacheDir, ".temp"));
+							cache.getParentFile().mkdirs();
+							FileOutputStream out = new FileOutputStream(temp);
+							try
+							{
+								bmp.compress(Bitmap.CompressFormat.PNG, 100, out);
+							}
+							finally
+							{
+								out.close();
+							}
+							synchronized(cache_access_)
+							{
+								cache.delete();
+								temp.renameTo(cache);
+							}
+						}
+						catch(IOException e)
+						{
+							e.printStackTrace();
+							ApplicationContext.getContext().addBugReport(e);
+						}
+					}
+				}
+			}).start();
 	}
 	
 	public void clearCache(long now)
