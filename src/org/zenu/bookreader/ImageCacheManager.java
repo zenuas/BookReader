@@ -91,7 +91,7 @@ public class ImageCacheManager
 		Bitmap bmp = getBitmap(book, page, width, height);
 		if(width > 0 && height > 0 && bmp != null)
 		{
-			makeCache(cache, bmp);
+			makeCache(cache, bmp, false);
 		}
 		
 		return(new BitmapDrawable(bmp));
@@ -115,13 +115,10 @@ public class ImageCacheManager
 		}
 		
 		Bitmap bmp = getBitmap(book, page, width, height);
-		if(width > 0 && height > 0 && bmp != null)
-		{
-			makeCache(cache, bmp);
-		}
+		if(bmp != null) {makeCache(cache, bmp, true);}
 	}
 	
-	public void makeCache(final File cache, final Bitmap bmp)
+	public void makeCache(final File cache, final Bitmap bmp, final boolean needRecycle)
 	{
 		new Thread(new Runnable()
 			{
@@ -142,6 +139,7 @@ public class ImageCacheManager
 							}
 							finally
 							{
+								if(needRecycle) {bmp.recycle();}
 								out.close();
 							}
 							synchronized(cache_access_)

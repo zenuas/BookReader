@@ -9,9 +9,11 @@ import android.app.AlertDialog.Builder;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnClickListener;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
@@ -542,7 +544,13 @@ public class BookViewer
 				@Override
 				protected void onPostExecute(Drawable result)
 				{
+					Drawable prev = image_.getDrawable();
 					image_.setImageDrawable(result);
+					if(prev != null && prev instanceof BitmapDrawable)
+					{
+						Bitmap bmp = ((BitmapDrawable) prev).getBitmap();
+						if(bmp != null) {bmp.recycle();}
+					}
 					handler_.removeCallbacks(wait_delay_);
 					wait_.dismiss();
 					setAutoRotateAndFitScaleAndCenter();
