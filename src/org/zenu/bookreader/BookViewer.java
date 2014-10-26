@@ -549,7 +549,10 @@ public class BookViewer
 					if(prev != null && prev instanceof BitmapDrawable)
 					{
 						Bitmap bmp = ((BitmapDrawable) prev).getBitmap();
-						if(bmp != null) {bmp.recycle();}
+						if(bmp != null)
+						{
+							((ApplicationContext) getApplicationContext()).getImageCache().recycleBitmap(bmp);
+						}
 					}
 					handler_.removeCallbacks(wait_delay_);
 					wait_.dismiss();

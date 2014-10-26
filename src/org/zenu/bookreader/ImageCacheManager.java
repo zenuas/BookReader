@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
+import java.util.HashMap;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -120,14 +121,25 @@ public class ImageCacheManager
 	
 	public void makeCache(final File cache, final Bitmap bmp, final boolean needRecycle)
 	{
+		if(!needRecycle)
+		{
+			synchronized(temp_create_)
+			{
+				recycleChain_.put(bmp, new Date().getTime());
+			}
+		}
+		
 		new Thread(new Runnable()
 			{
 				@Override
 				public void run()
 				{
-					// .tempにファイル出力し、最後に目的のファイルにリネームする
 					synchronized(temp_create_)
 					{
+						// リサイクル対象から外れていればキャッシュ作成不可
+						if(!needRecycle && !recycleChain_.containsKey(bmp)) {return;}
+						
+						// .tempにファイル出力し、最後に目的のファイルにリネームする
 						try
 						{
 							File temp = new File(Path.combine(CacheDir, ".temp"));
@@ -156,6 +168,20 @@ public class ImageCacheManager
 					}
 				}
 			}).start();
+	}
+	
+	private HashMap<Bitmap, Long> recycleChain_ = new HashMap<Bitmap, Long>();
+	public void recycleBitmap(Bitmap bmp)
+	{
+		if(bmp == null) {return;}
+		
+		synchronized(temp_create_)
+		{
+			if(!recycleChain_.containsKey(bmp)) {return;}
+			
+			recycleChain_.remove(bmp);
+			bmp.recycle();
+		}
 	}
 	
 	public void clearCache(long now)
